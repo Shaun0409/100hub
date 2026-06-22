@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — 100 HUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        /* Dashboard specific styles */
+        .dashboard-layout {
+            padding-top: 100px;
+            min-height: 100vh;
+            background: var(--black);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .dashboard-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .dashboard-title span {
+            color: var(--red);
+        }
+
+        .dashboard-stats {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--black-card);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: var(--radius-sm);
+            padding: 16px 24px;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .stat-card .number {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--red);
+            display: block;
+        }
+
+        .stat-card .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .dashboard-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .btn-outline {
+            padding: 10px 20px;
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 60px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .btn-outline.danger:hover {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        .table-wrap {
+            background: var(--black-card);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: var(--radius);
+            overflow: hidden;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 600px;
+        }
+
+        thead {
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        th {
+            text-align: left;
+            padding: 14px 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .member-role {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 500;
+            background: rgba(227,30,36,0.1);
+            color: var(--red);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .delete-btn:hover {
+            color: #ff4444;
+            background: rgba(255,68,68,0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--black-card);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-sm);
+            padding: 16px 24px;
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 999;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { border-left: 3px solid #4caf50; }
+        .toast.error { border-left: 3px solid #ff4444; }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-link:hover {
+            color: var(--white);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .dashboard-stats {
+                width: 100%;
+            }
+            .stat-card {
+                flex: 1;
+                min-width: 80px;
+            }
+            .dashboard-title {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== NAVIGATION ==================== -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-inner">
+                <a href="/" class="nav-logo">
+                    <span class="logo-text">100 <span class="highlight-red">HUB</span></span>
+                </a>
+                <div class="nav-links">
+                    <a href="/">Home</a>
+                    <a href="/dashboard.html" style="color:var(--red);">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <section class="dashboard-layout">
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+                    <h1 class="dashboard-title">Member <span>Dashboard</span></h1>
+                </div>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <span class="number" id="totalMembers">0</span>
+                        <span class="label">Total Members</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="number" id="roadProgress">0%</span>
+                        <span class="label">Road to 100</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-actions">
+                <button class="btn-outline" onclick="refreshMembers()">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+                <button class="btn-outline" onclick="exportCSV()">
+                    <i class="fa-solid fa-download"></i> Export CSV
+                </button>
+                <button class="btn-outline danger" onclick="confirmDeleteAll()">
+                    <i class="fa-solid fa-trash"></i> Delete All
+                </button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            <th style="text-align:center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTableBody">
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="fa-regular fa-users"></i>
+                                    <p>Loading members...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TOAST ==================== -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        const API_BASE = '/.netlify/functions';
+
+        // ==========================================
+        // FETCH MEMBERS
+        // ==========================================
+        async function fetchMembers() {
+            try {
+                const response = await fetch(`${API_BASE}/members`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching members:', error);
+                return { members: [], count: 0 };
+            }
+        }
+
+        // ==========================================
+        // RENDER TABLE
+        // ==========================================
+        async function renderMembers() {
+            const tbody = document.getElementById('membersTableBody');
+            const data = await fetchMembers();
+
+            // Update stats
+            document.getElementById('totalMembers').textContent = data.count || 0;
+            const progress = Math.round(((data.count || 0) / 100) * 100);
+            document.getElementById('roadProgress').textContent = progress + '%';
+
+            if (!data.members || data.members.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="fa-regular fa-users"></i>
+                                <p>No members yet. Share the site and start growing!</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = data.members.map((member, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><strong style="color:var(--white);">${member.name}</strong></td>
+                    <td><a href="mailto:${member.email}" style="color:var(--text-secondary); text-decoration:none;">${member.email}</a></td>
+                    <td><span class="member-role">${member.role}</span></td>
+                    <td>${member.timestamp ? new Date(member.timestamp).toLocaleDateString() : 'N/A'}</td>
+                    <td style="text-align:center;">
+                        <button class="delete-btn" onclick="deleteMember('${member.id}')" title="Delete member">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ==========================================
+        // DELETE SINGLE MEMBER
+        // ==========================================
+        async function deleteMember(id) {
+            if (!confirm('Are you sure you want to delete this member?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/delete-member`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Member deleted successfully.', 'success');
+                    renderMembers();
+                } else {
+                    showToast('Failed to delete member.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error deleting member.', 'error');
+            }
+        }
+
+        // ==========================================
+        // DELETE ALL MEMBERS
+        // ==========================================
+        async function confirmDeleteAll() {
+            if (!confirm('⚠️ Are you sure you want to delete ALL members? This cannot be undone.')) return;
+            if (!confirm('Really? All member data will be permanently removed.')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/delete-member`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deleteAll: true })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('All members deleted.', 'success');
+                    renderMembers();
+                } else {
+                    showToast('Failed to delete members.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error deleting members.', 'error');
+            }
+        }
+
+        // ==========================================
+        // EXPORT CSV
+        // ==========================================
+        async function exportCSV() {
+            try {
+                const data = await fetchMembers();
+                if (!data.members || data.members.length === 0) {
+                    showToast('No members to export.', 'error');
+                    return;
+                }
+
+                // Build CSV
+                const headers = ['Name', 'Email', 'Role', 'Message', 'Joined'];
+                const rows = data.members.map(m => [
+                    `"${m.name}"`,
+                    `"${m.email}"`,
+                    `"${m.role}"`,
+                    `"${m.message || ''}"`,
+                    `"${m.timestamp ? new Date(m.timestamp).toLocaleString() : ''}"`
+                ]);
+
+                const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+
+                // Download
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `100HUB_Members_${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                showToast('CSV exported successfully!', 'success');
+            } catch (error) {
+                console.error('Error exporting CSV:', error);
+                showToast('Error exporting CSV.', 'error');
+            }
+        }
+
+        // ==========================================
+        // REFRESH
+        // ==========================================
+        function refreshMembers() {
+            renderMembers();
+            showToast('Refreshed!', 'success');
+        }
+
+        // ==========================================
+        // TOAST NOTIFICATION
+        // ==========================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', renderMembers);
+
+        console.log('📊 100 HUB Dashboard loaded.');
+    </script>
+
+</body>
+</html>

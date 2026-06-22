@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>100 Projects Media — Broadcasting & Media Production</title>
-    <meta name="description" content="100 Projects Media - Your partner in Multimedia, PR, Events & Management." />
+    <title>100 HUB — Broadcasting & Media Production</title>
+    <meta name="description" content="100 HUB - Your partner in Multimedia, PR, Events & Management." />
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,8 @@
         <div class="container">
             <div class="nav-inner">
                 <a href="#" class="nav-logo">
-                    <span class="logo-text"> 100 <span class="highlight-red">Projects</span></span>
+                    <img src="Assets/100_Logo.png" alt="100 HUB" class="logo-img" />
+                    <span class="logo-text"><span class="highlight-red">HUB</span></span>
                 </a>
                 <button class="nav-toggle" aria-label="Toggle navigation">
                     <span class="hamburger"></span>
@@ -28,7 +29,7 @@
                 <div class="nav-links">
                     <a href="#feed">Work</a>
                     <a href="#community">Community</a>
-                    <a href="#founders">Team</a>
+                    <a href="#team">Team</a>
                     <a href="#contact">Contact</a>
                 </div>
             </div>
@@ -40,10 +41,10 @@
         <div class="hero-ambient"></div>
         <div class="container">
             <div class="hero-content">
-            
+                <img src="Assets/100_Logo.png" alt="100 HUB" class="hero-logo-img" />
                 <h1 class="hero-title">
                     <span class="hero-number">100</span>
-                    <span class="hero-word">Projects</span>
+                    <span class="hero-word">HUB</span>
                 </h1>
                 <div class="hero-divider">
                     <span class="divider-line"></span>
@@ -61,10 +62,10 @@
                 </div>
             </div>
         </div>
-        <div class="hero-scroll">
+        <!-- <div class="hero-scroll">
             <span>Scroll</span>
             <div class="scroll-line"></div>
-        </div>
+        </div> -->
     </section>
 
     <!-- ==================== FEED ==================== -->
@@ -72,7 +73,7 @@
         <div class="container">
             <div class="section-header">
                 <span class="section-number">01</span>
-                <h2 class="section-title">The <span class="highlight-red">Journal</span></h2>
+                <h2 class="section-title">Media</h2>
                 <div class="section-divider">
                     <span class="divider-line-short"></span>
                     <span class="divider-dot"></span>
@@ -88,6 +89,12 @@
                     <div class="loader"></div>
                     <p>Loading the latest dispatches...</p>
                 </div>
+            </div>
+            <!-- See More Posts Button -->
+            <div class="see-more-container">
+                <a href="https://www.instagram.com/100projectsmedia" target="_blank" class="see-more-btn">
+                    See More Posts <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
         </div>
     </section>
@@ -117,20 +124,35 @@
                     <span class="divider-dot"></span>
                     <span class="divider-line-short"></span>
                 </div>
-                <p class="section-subtitle">Become part of the 100 Projects Media ecosystem</p>
+                <p class="section-subtitle">Become part of the 100 HUB ecosystem</p>
             </div>
+
+            <!-- ROAD TO 100 COUNTER -->
+            <div class="road-to-100">
+                <span class="road-label">ROAD TO 100</span>
+                <div class="road-counter">
+                    <span class="road-number" id="memberCount">3</span>
+                    <span class="road-total">/ 100</span>
+                </div>
+                <div class="road-progress">
+                    <div class="road-progress-bar" id="progressBar" style="width: 3%;"></div>
+                </div>
+                <p class="road-status" id="roadStatus">3 creators have joined the journey</p>
+            </div>
+
             <div class="community-grid">
                 <div class="community-content">
                     <h3>Creators Community</h3>
                     <p>Join a network of creators, writers, and media professionals. Get exclusive content, early access, and opportunities to collaborate.</p>
                     <ul class="community-benefits">
-                        <li><i class="fa-regular fa-circle-check"></i> Exclusive content & early access</li>
-                        <li><i class="fa-regular fa-circle-check"></i> Network with fellow creators</li>
-                        <li><i class="fa-regular fa-circle-check"></i> Collaborate on projects</li>
-                        <li><i class="fa-regular fa-circle-check"></i> Monthly community events</li>
+                        <li><i class="fa-regular fa-circle-check"></i> Creative Opportunities</li>
+                        <li><i class="fa-regular fa-circle-check"></i> Editorial Features</li>
+                        <li><i class="fa-regular fa-circle-check"></i> Events & Networking</li>
+                        <li><i class="fa-regular fa-circle-check"></i> Industry Conversations</li>
+                        <li><i class="fa-regular fa-circle-check"></i> Brand Collaborations</li>
                     </ul>
                 </div>
-                <div class="community-form">
+                <div class="community-form" id="signupForm">
                     <h3>Become a Member</h3>
                     <form id="membershipForm">
                         <div class="form-group">
@@ -140,18 +162,12 @@
                             <input type="email" id="memberEmail" placeholder="Email Address" required />
                         </div>
                         <div class="form-group">
-                            <select id="memberRole" required>
-                                <option value="">I want to join as...</option>
-                                <option value="creator">Creator</option>
-                                <option value="writer">Writer</option>
-                                <option value="partner">Partner</option>
-                                <option value="supporter">Supporter</option>
-                            </select>
+                            <input type="text" id="memberRole" placeholder="I want to join as... (e.g., Creator, Writer, Partner, Supporter)" required />
                         </div>
                         <div class="form-group">
                             <textarea id="memberMessage" rows="3" placeholder="Tell us about yourself (optional)"></textarea>
                         </div>
-                        <button type="submit" class="btn-primary full-width">
+                        <button type="submit" class="btn-primary full-width" id="submitBtn">
                             <i class="fa-regular fa-paper-plane"></i> Become a Member
                         </button>
                     </form>
@@ -159,13 +175,18 @@
                         <i class="fa-regular fa-circle-check" style="font-size:32px; display:block; margin-bottom:12px;"></i>
                         <p>Thank you for joining! We'll be in touch soon.</p>
                     </div>
+                    <div id="formFull" style="display:none; text-align:center; padding:20px;">
+                        <i class="fa-regular fa-circle-xmark" style="font-size:32px; display:block; margin-bottom:12px; color:var(--red);"></i>
+                        <p style="color:var(--text-secondary);">🎉 The community is full! We've reached 100 members.</p>
+                        <p style="color:var(--text-muted); font-size:14px;">Follow us on Instagram for updates on future opportunities.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ==================== FOUNDERS ==================== -->
-    <section class="founders-section" id="founders">
+    <!-- ==================== TEAM ==================== -->
+    <section class="team-section" id="team">
         <div class="container">
             <div class="section-header">
                 <span class="section-number">03</span>
@@ -179,33 +200,33 @@
                     <span class="divider-line-short"></span>
                 </div>
             </div>
-            <div class="founders-grid">
-                <div class="founder-card">
-                    <div class="founder-image">
-                        <img src="team/Khosi.jpeg" alt="Serutcip" />
-                        <a href="https://www.linkedin.com/in/serutcip-entertainment-288195353" target="_blank" class="founder-linkedin">
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-image">
+                        <img src="team/Mpilo.jpeg" alt="Mpilo Nhlapho" />
+                        <a href="https://www.linkedin.com/in/mpilo-nhlapho-611752251" target="_blank" class="team-linkedin">
                             <i class="fa-brands fa-linkedin-in"></i>
                         </a>
                     </div>
-                    <div class="founder-info">
-                        <h3 class="founder-name">Lesley Khocy</h3>
-                        <p class="founder-role">Co-Founder, Visual Director, Editor In Chief</p>
-                        <a href="https://www.linkedin.com/in/serutcip-entertainment-288195353" target="_blank" class="founder-link">
+                    <div class="team-info">
+                        <h3 class="team-name">Mpilo Nhlapho</h3>
+                        <p class="team-role">Founder &amp; CBO</p>
+                        <a href="https://www.linkedin.com/in/mpilo-nhlapho-611752251" target="_blank" class="team-link">
                             <i class="fa-brands fa-linkedin-in"></i> Connect on LinkedIn
                         </a>
                     </div>
                 </div>
-                <div class="founder-card">
-                    <div class="founder-image">
-                        <img src="team/Mpilo.jpeg" alt="Mpilo Nhlapho" />
-                        <a href="https://www.linkedin.com/in/mpilo-nhlapho-611752251" target="_blank" class="founder-linkedin">
+                <div class="team-card">
+                    <div class="team-image">
+                        <img src="team/Khosi.jpeg" alt="Lesley Khocy" />
+                        <a href="https://www.linkedin.com/in/serutcip-entertainment-288195353" target="_blank" class="team-linkedin">
                             <i class="fa-brands fa-linkedin-in"></i>
                         </a>
                     </div>
-                    <div class="founder-info">
-                        <h3 class="founder-name">Mpilo Nhlapho</h3>
-                        <p class="founder-role">Founder &amp; CBO</p>
-                        <a href="https://www.linkedin.com/in/mpilo-nhlapho-611752251" target="_blank" class="founder-link">
+                    <div class="team-info">
+                        <h3 class="team-name">Lesley Khocy</h3>
+                        <p class="team-role">Co-Founder, Visual Director, Editor In Chief</p>
+                        <a href="https://www.linkedin.com/in/serutcip-entertainment-288195353" target="_blank" class="team-link">
                             <i class="fa-brands fa-linkedin-in"></i> Connect on LinkedIn
                         </a>
                     </div>
@@ -271,7 +292,7 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <img src="Assets/100_Logo.png" alt="100 Projects Media" class="footer-logo" />
+                <img src="Assets/100_Logo.png" alt="100 HUB" class="footer-logo" />
                 <div class="footer-divider">
                     <span class="divider-line-short"></span>
                     <span class="divider-dot"></span>
@@ -287,7 +308,7 @@
                     <a href="https://youtu.be/Z1G7TeuiMz4?si=peQqspcPTATRZYsd" target="_blank"><i class="fa-brands fa-youtube"></i></a>
                     <a href="mailto:100projectsmedia@gmail.com"><i class="fa-regular fa-envelope"></i></a>
                 </div>
-                <p class="footer-copy">&copy; 2026 100 Projects Media. All rights reserved.</p>
+                <p class="footer-copy">&copy; 2026 100 HUB. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -301,9 +322,148 @@
         const FEED_URL = `https://feeds.behold.so/${BEHOLD_FEED_ID}`;
 
         // ==========================================
-        // SUBSTACK CONFIG — UPDATE THIS WITH YOUR SUBSTACK URL
+        // ARTICLES — SHEET.BEST API (Google Sheets)
         // ==========================================
-        const SUBSTACK_URL = 'https://YOUR_SUBSTACK.substack.com'; // CHANGE THIS
+        const ARTICLES_API_URL = 'https://api.sheetbest.com/sheets/ea89e6d2-3087-4506-ab5b-31e9802bcd62';
+        const FALLBACK_ARTICLES_URL = 'articles.json';
+
+        let articleLinks = {};
+
+        async function loadArticles() {
+            try {
+                const response = await fetch(ARTICLES_API_URL);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (Array.isArray(data)) {
+                        articleLinks = {};
+                        data.forEach(row => {
+                            if (row.postId && row.articleUrl) {
+                                articleLinks[row.postId] = row.articleUrl;
+                            }
+                        });
+                        console.log('📄 Articles loaded from Sheet.best:', Object.keys(articleLinks).length);
+                        return;
+                    }
+                }
+                console.log('📄 Trying fallback...');
+                const fallbackResponse = await fetch(FALLBACK_ARTICLES_URL);
+                if (fallbackResponse.ok) {
+                    const data = await fallbackResponse.json();
+                    if (data.articles) {
+                        articleLinks = data.articles;
+                        console.log('📄 Articles loaded from fallback:', Object.keys(articleLinks).length);
+                    }
+                }
+            } catch (error) {
+                console.log('ℹ️ Could not load articles');
+                articleLinks = {};
+            }
+        }
+
+        function getArticleUrl(postId) {
+            return articleLinks[postId] || null;
+        }
+
+        // ==========================================
+        // API ENDPOINT (Netlify Function)
+        // ==========================================
+        const API_URL = '/.netlify/functions/signup';
+
+        // ==========================================
+        // MEMBER COUNT
+        // ==========================================
+        const MAX_MEMBERS = 100;
+
+        function getMemberCount() {
+            let count = localStorage.getItem('memberCount');
+            if (count === null) {
+                localStorage.setItem('memberCount', 3);
+                return 3;
+            }
+            return parseInt(count);
+        }
+
+        function setMemberCount(count) {
+            localStorage.setItem('memberCount', count);
+            updateCounterDisplay();
+        }
+
+        function updateCounterDisplay() {
+            const count = getMemberCount();
+            const counter = document.getElementById('memberCount');
+            const progress = document.getElementById('progressBar');
+            const status = document.getElementById('roadStatus');
+            const form = document.getElementById('signupForm');
+            const fullMsg = document.getElementById('formFull');
+            const successMsg = document.getElementById('formSuccess');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (counter) counter.textContent = count;
+            if (progress) progress.style.width = (count / MAX_MEMBERS) * 100 + '%';
+            if (status) status.textContent = count + ' creators have joined the journey';
+
+            if (count >= MAX_MEMBERS) {
+                if (form) form.style.display = 'none';
+                if (fullMsg) fullMsg.style.display = 'block';
+                if (successMsg) successMsg.style.display = 'none';
+                if (submitBtn) submitBtn.disabled = true;
+            } else {
+                if (fullMsg) fullMsg.style.display = 'none';
+            }
+        }
+
+        // ==========================================
+        // MEMBERSHIP FORM SUBMISSION
+        // ==========================================
+        document.getElementById('membershipForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const currentCount = getMemberCount();
+            if (currentCount >= MAX_MEMBERS) {
+                alert('The community is full! We\'ve reached 100 members.');
+                return;
+            }
+            
+            const name = document.getElementById('memberName').value;
+            const email = document.getElementById('memberEmail').value;
+            const role = document.getElementById('memberRole').value;
+            const message = document.getElementById('memberMessage').value;
+            
+            if (!name || !email || !role) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+            
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, role, message })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    localStorage.setItem('memberCount', result.count);
+                    updateCounterDisplay();
+                    this.style.display = 'none';
+                    document.getElementById('formSuccess').style.display = 'block';
+                    this.reset();
+                } else {
+                    alert(result.error || 'Something went wrong. Please try again.');
+                }
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Become a Member';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Become a Member';
+            });
+        });
 
         // ==========================================
         // FETCH AND RENDER FEED
@@ -340,12 +500,10 @@
                 let videoUrl = '';
                 let isVideo = post.mediaType === 'VIDEO' || post.isReel === true;
                 
-                // Get video URL if it's a video
                 if (isVideo && post.mediaUrl) {
                     videoUrl = post.mediaUrl;
                 }
                 
-                // Get image URL (thumbnail for videos)
                 if (post.sizes?.large?.mediaUrl) {
                     imageUrl = post.sizes.large.mediaUrl;
                 } else if (post.mediaUrl && !isVideo) {
@@ -354,12 +512,11 @@
                     imageUrl = post.sizes.medium.mediaUrl;
                 }
                 
-                // For carousel, use first child
                 if (post.mediaType === 'CAROUSEL_ALBUM' && post.children?.length > 0) {
                     const child = post.children[0];
                     if (child.sizes?.large?.mediaUrl) imageUrl = child.sizes.large.mediaUrl;
                     else if (child.mediaUrl) imageUrl = child.mediaUrl;
-                    isVideo = false; // Carousel items are images
+                    isVideo = false;
                 }
                 
                 const caption = post.prunedCaption || post.caption || '';
@@ -369,9 +526,8 @@
                     day: 'numeric',
                     year: 'numeric'
                 }) : '';
-                const writer = "100 Projects Media";
+                const writer = "100 HUB";
                 
-                // Build media HTML
                 let mediaHtml = '';
                 if (isVideo && videoUrl) {
                     mediaHtml = `
@@ -403,11 +559,9 @@
                 `;
             }).join('');
             
-            // Auto-play videos after render
             document.querySelectorAll('.feed-image video').forEach(video => {
                 video.addEventListener('mouseenter', () => video.play());
                 video.addEventListener('mouseleave', () => video.pause());
-                // Also play when visible
                 if (video.getBoundingClientRect().top < window.innerHeight) {
                     video.play();
                 }
@@ -430,12 +584,10 @@
             let videoUrl = '';
             let isVideo = postData.mediaType === 'VIDEO' || postData.isReel === true;
             
-            // Get video URL if it's a video
             if (isVideo && postData.mediaUrl) {
                 videoUrl = postData.mediaUrl;
             }
             
-            // Get image URL (thumbnail for videos)
             if (postData.sizes?.large?.mediaUrl) {
                 imageUrl = postData.sizes.large.mediaUrl;
             } else if (postData.mediaUrl && !isVideo) {
@@ -457,11 +609,12 @@
                 day: 'numeric',
                 year: 'numeric'
             }) : '';
-            const writer = "100 Projects Media";
+            const writer = "100 HUB";
             const permalink = postData.permalink || '#';
-            const articleUrl = `${SUBSTACK_URL}/p/${postData.id}`;
             
-            // Build media HTML for modal
+            const articleUrl = getArticleUrl(postData.id);
+            const hasArticle = articleUrl !== null;
+            
             let mediaHtml = '';
             if (isVideo && videoUrl) {
                 mediaHtml = `
@@ -469,6 +622,15 @@
                 `;
             } else {
                 mediaHtml = `<img src="${imageUrl}" alt="${caption.substring(0, 50)}" />`;
+            }
+            
+            let articleButtonHtml = '';
+            if (hasArticle) {
+                articleButtonHtml = `
+                    <a href="${articleUrl}" target="_blank" class="btn-primary">
+                        <i class="fa-regular fa-file-lines"></i> View Full Article
+                    </a>
+                `;
             }
             
             modalBody.innerHTML = `
@@ -479,13 +641,12 @@
                     <div class="modal-meta">
                         <span class="modal-writer"><i class="fa-regular fa-user"></i> ${writer}</span>
                         <span class="modal-date"><i class="fa-regular fa-calendar"></i> ${date}</span>
+                        ${hasArticle ? `<span class="modal-article-badge"><i class="fa-regular fa-file-lines"></i> Article Available</span>` : ''}
                     </div>
                     <h2 class="modal-title">${caption.split('\n')[0] || 'Untitled'}</h2>
                     <div class="modal-caption">${caption.replace(/\n/g, '<br>')}</div>
                     <div class="modal-actions">
-                        <a href="${articleUrl}" target="_blank" class="btn-primary">
-                            <i class="fa-regular fa-file-lines"></i> View Full Article
-                        </a>
+                        ${articleButtonHtml}
                         <a href="${permalink}" target="_blank" class="btn-secondary">
                             <i class="fa-regular fa-eye"></i> View on Instagram
                         </a>
@@ -496,7 +657,6 @@
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
             
-            // Auto-play video in modal
             setTimeout(() => {
                 const modalVideo = document.querySelector('.modal-image video');
                 if (modalVideo) {
@@ -506,7 +666,6 @@
         }
 
         function closeModal() {
-            // Pause any video in modal
             const modalVideo = document.querySelector('.modal-image video');
             if (modalVideo) {
                 modalVideo.pause();
@@ -519,29 +678,6 @@
         modalOverlay.addEventListener('click', closeModal);
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
-        });
-
-        // ==========================================
-        // MEMBERSHIP FORM
-        // ==========================================
-        document.getElementById('membershipForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('memberName').value;
-            const email = document.getElementById('memberEmail').value;
-            const role = document.getElementById('memberRole').value;
-            const message = document.getElementById('memberMessage').value;
-            
-            if (!name || !email || !role) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
-            console.log('New Member:', { name, email, role, message });
-            
-            this.style.display = 'none';
-            document.getElementById('formSuccess').style.display = 'block';
-            this.reset();
         });
 
         // ==========================================
@@ -590,12 +726,215 @@
         // ==========================================
         // INIT
         // ==========================================
-        document.addEventListener('DOMContentLoaded', fetchFeed);
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadArticles();
+            fetchFeed();
+            updateCounterDisplay();
+        });
 
-        console.log('🎯 100 Projects Media — Website Loaded');
+        console.log('🎯 100 HUB — Website Loaded');
         console.log('📸 Feed ID:', BEHOLD_FEED_ID);
-        console.log('📝 Substack URL:', SUBSTACK_URL);
+        console.log('👥 Member Count:', getMemberCount(), '/', MAX_MEMBERS);
+
+        // ==========================================
+        // POST ID TOOL — Tiny & Simple for Clients
+        // ==========================================
+        let cachedPostIds = [];
+
+        // Make functions globally accessible
+        window.openPostIdTool = function() {
+            const tool = document.getElementById('postIdTool');
+            if (!tool) return;
+            tool.style.display = 'block';
+            loadPostIds();
+        };
+
+        window.copyPostId = function(postId) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(postId).then(() => {
+                    showToast('✅ Copied: ' + postId);
+                }).catch(() => {
+                    fallbackCopy(postId);
+                });
+            } else {
+                fallbackCopy(postId);
+            }
+        };
+
+        window.copyAllPostIds = function() {
+            if (cachedPostIds.length === 0) {
+                showToast('⚠️ No post IDs to copy.');
+                return;
+            }
+            const text = cachedPostIds.join('\n');
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('✅ Copied ' + cachedPostIds.length + ' post IDs!');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        };
+
+        function loadPostIds() {
+            const container = document.getElementById('postIdList');
+            if (!container) return;
+            
+            const items = document.querySelectorAll('.feed-item');
+            if (items.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">No posts found. Wait for the feed to load.</p>';
+                return;
+            }
+
+            cachedPostIds = [];
+            let html = '';
+            
+            items.forEach((el, index) => {
+                try {
+                    const data = JSON.parse(el.dataset.post);
+                    const postId = data.id || 'Unknown';
+                    const permalink = data.permalink || '#';
+                    cachedPostIds.push(postId);
+
+                    let imgSrc = '';
+                    if (data.sizes?.large?.mediaUrl) {
+                        imgSrc = data.sizes.large.mediaUrl;
+                    } else if (data.mediaUrl) {
+                        imgSrc = data.mediaUrl;
+                    }
+
+                    html += `
+                        <div style="display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+                            ${imgSrc ? `<img src="${imgSrc}" style="width:32px; height:32px; object-fit:cover; border-radius:4px; flex-shrink:0;" />` : ''}
+                            <div style="flex:1; min-width:0;">
+                                <div style="font-size:11px; color:var(--text-secondary); font-family:monospace; word-break:break-all; background:rgba(0,0,0,0.3); padding:3px 6px; border-radius:3px;">
+                                    ${postId}
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:4px; flex-shrink:0;">
+                                <button onclick="copyPostId('${postId}')" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:4px; color:var(--text-secondary); padding:2px 8px; font-size:10px; cursor:pointer;">
+                                    📋
+                                </button>
+                                <a href="${permalink}" target="_blank" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:4px; color:var(--text-secondary); padding:2px 8px; font-size:10px; text-decoration:none;">
+                                    👁️
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } catch (e) {}
+            });
+
+            if (html === '') {
+                container.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">No posts found.</p>';
+            } else {
+                container.innerHTML = html;
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('✅ Copied: ' + text);
+            } catch (e) {
+                showToast('⚠️ Could not copy.');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showToast(message) {
+            const existing = document.querySelector('.post-id-toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'post-id-toast';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--black-card);
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 8px;
+                padding: 10px 20px;
+                color: var(--white);
+                font-size: 12px;
+                z-index: 10000;
+                box-shadow: var(--shadow-large);
+                animation: fadeInUp 0.3s ease;
+                max-width: 90%;
+                text-align: center;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Style for animations
+        const toolStyle = document.createElement('style');
+        toolStyle.textContent = `
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            }
+        `;
+        document.head.appendChild(toolStyle);
+
+        // Update list when feed changes
+        const toolObserver = new MutationObserver(() => {
+            const tool = document.getElementById('postIdTool');
+            if (tool && tool.style.display !== 'none') {
+                loadPostIds();
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const feed = document.getElementById('instagramFeed');
+            if (feed) {
+                toolObserver.observe(feed, { childList: true, subtree: true });
+            }
+        });
     </script>
+
+    <!-- ==================== POST ID TOOL (Tiny button — bottom right) ==================== -->
+    <!-- Hidden tool panel -->
+    <div id="postIdTool" style="display:none; position:fixed; bottom:80px; right:20px; max-width:360px; width:90%; max-height:60vh; overflow-y:auto; background:var(--black-card); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius-sm); padding:14px 16px; z-index:9998; box-shadow:var(--shadow-large);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="font-family:'Playfair Display',serif; font-size:15px; color:var(--white); margin:0;">🔑 Post IDs</h3>
+            <button onclick="document.getElementById('postIdTool').style.display='none'" style="background:none; border:none; color:var(--text-muted); font-size:16px; cursor:pointer; padding:0 4px;">✕</button>
+        </div>
+        <p style="font-size:10px; color:var(--text-muted); margin-bottom:10px; opacity:0.6;">
+            Copy the ID for each post → paste into Google Sheet with article URL.
+        </p>
+        <div id="postIdList" style="max-height:30vh; overflow-y:auto;">
+            <p style="color:var(--text-muted); font-size:11px;">Loading posts...</p>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button onclick="copyAllPostIds()" style="background:var(--red); color:var(--white); border:none; border-radius:60px; padding:5px 14px; font-size:10px; cursor:pointer;">
+                📋 Copy All
+            </button>
+            <button onclick="document.getElementById('postIdTool').style.display='none'" style="background:rgba(255,255,255,0.05); color:var(--text-secondary); border:1px solid rgba(255,255,255,0.06); border-radius:60px; padding:5px 14px; font-size:10px; cursor:pointer;">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Tiny 🔑 button — bottom right corner -->
+    <button onclick="openPostIdTool()" style="position:fixed; bottom:20px; right:20px; background:rgba(227,30,36,0.12); color:var(--red); border:1px solid rgba(227,30,36,0.15); border-radius:50%; width:30px; height:30px; font-size:11px; cursor:pointer; z-index:9999; transition:var(--transition-fast); display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); opacity:0.35;">
+        🔑
+    </button>
 
 </body>
 </html>
