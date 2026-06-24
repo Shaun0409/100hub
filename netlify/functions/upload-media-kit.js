@@ -1,29 +1,43 @@
 // netlify/functions/upload-media-kit.js
 // Manages media kit via Google Apps Script API
 
-const API_BASE = 'https://script.google.com/macros/s/AKfycbzr0Z1TpP1VzkUOTwM39ef49bdL8Fspj9V7QPROuG0tDYwGB7mS7-__V8OfFx6fDKt2KQ/exec';
+// ✅ REPLACE THIS WITH YOUR ACTUAL DEPLOYMENT ID
+const API_BASE = 'https://script.google.com/macros/s/AKfycbyM7LSIRLazzgxXw18r6voB3IyoO6aHBdq_Auq0SOdbWgEvHocrze21CBBSTYptdi4czg/exec';
 
 exports.handler = async function(event, context) {
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+    };
+
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 204, headers, body: '' };
+    }
+
     // GET - fetch media kit URL
     if (event.httpMethod === 'GET') {
         try {
             const response = await fetch(`${API_BASE}?action=getMediaKit`);
             const data = await response.json();
-            
+
             if (data.url) {
                 return {
                     statusCode: 200,
+                    headers,
                     body: JSON.stringify({ success: true, url: data.url })
                 };
             } else {
                 return {
                     statusCode: 404,
+                    headers,
                     body: JSON.stringify({ error: 'Media Kit not found' })
                 };
             }
         } catch (error) {
             return {
                 statusCode: 500,
+                headers,
                 body: JSON.stringify({ error: 'Failed to fetch media kit' })
             };
         }
@@ -38,6 +52,7 @@ exports.handler = async function(event, context) {
             if (!url) {
                 return {
                     statusCode: 400,
+                    headers,
                     body: JSON.stringify({ error: 'URL is required' })
                 };
             }
@@ -48,6 +63,7 @@ exports.handler = async function(event, context) {
             } catch (e) {
                 return {
                     statusCode: 400,
+                    headers,
                     body: JSON.stringify({ error: 'Invalid URL format' })
                 };
             }
@@ -63,12 +79,14 @@ exports.handler = async function(event, context) {
             if (result.error) {
                 return {
                     statusCode: 400,
+                    headers,
                     body: JSON.stringify({ error: result.error })
                 };
             }
 
             return {
                 statusCode: 200,
+                headers,
                 body: JSON.stringify({
                     success: true,
                     message: 'Media Kit URL saved successfully!',
@@ -79,6 +97,7 @@ exports.handler = async function(event, context) {
             console.error('Media kit error:', error);
             return {
                 statusCode: 500,
+                headers,
                 body: JSON.stringify({ error: 'Failed to save media kit: ' + error.message })
             };
         }
@@ -86,6 +105,7 @@ exports.handler = async function(event, context) {
 
     return {
         statusCode: 405,
+        headers,
         body: JSON.stringify({ error: 'Method not allowed' })
     };
 };

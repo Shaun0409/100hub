@@ -1,9 +1,9 @@
 // netlify/functions/members.js
 // Fetches members from Google Apps Script API
 
-const API_BASE = 'https://script.google.com/macros/s/AKfycbzr0Z1TpP1VzkUOTwM39ef49bdL8Fspj9V7QPROuG0tDYwGB7mS7-__V8OfFx6fDKt2KQ/exec';
+// ✅ REPLACE THIS WITH YOUR ACTUAL DEPLOYMENT ID
+const API_BASE = 'https://script.google.com/macros/s/AKfycbyM7LSIRLazzgxXw18r6voB3IyoO6aHBdq_Auq0SOdbWgEvHocrze21CBBSTYptdi4czg/exec';
 
-// Default owners (first 3 members)
 const DEFAULT_OWNERS = [
     {
         id: 'owner_1',
@@ -32,18 +32,32 @@ const DEFAULT_OWNERS = [
 ];
 
 exports.handler = async function(event, context) {
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+    };
+
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 204, headers, body: '' };
+    }
+
     if (event.httpMethod !== 'GET') {
-        return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+        return {
+            statusCode: 405,
+            headers,
+            body: JSON.stringify({ error: 'Method not allowed' })
+        };
     }
 
     try {
         const response = await fetch(`${API_BASE}?action=getMembers`);
         const data = await response.json();
-        
+
         // Combine owners with sheet members
         const allMembers = [...DEFAULT_OWNERS];
         const existingEmails = new Set(DEFAULT_OWNERS.map(m => m.email.toLowerCase()));
-        
+
         if (data.members && Array.isArray(data.members)) {
             data.members.forEach(m => {
                 if (m.email && !existingEmails.has(m.email.toLowerCase())) {
@@ -59,9 +73,10 @@ exports.handler = async function(event, context) {
                 }
             });
         }
-        
+
         return {
             statusCode: 200,
+            headers,
             body: JSON.stringify({
                 members: allMembers,
                 count: allMembers.length
@@ -71,6 +86,7 @@ exports.handler = async function(event, context) {
         console.error('Members error:', error);
         return {
             statusCode: 200,
+            headers,
             body: JSON.stringify({
                 members: DEFAULT_OWNERS,
                 count: DEFAULT_OWNERS.length

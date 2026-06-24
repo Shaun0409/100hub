@@ -1,22 +1,35 @@
 // netlify/functions/partners.js
 // Manages partners via Google Apps Script API
 
-const API_BASE = 'https://script.google.com/macros/s/AKfycbzr0Z1TpP1VzkUOTwM39ef49bdL8Fspj9V7QPROuG0tDYwGB7mS7-__V8OfFx6fDKt2KQ/exec';
+// ✅ REPLACE THIS WITH YOUR ACTUAL DEPLOYMENT ID
+const API_BASE = 'https://script.google.com/macros/s/AKfycbyM7LSIRLazzgxXw18r6voB3IyoO6aHBdq_Auq0SOdbWgEvHocrze21CBBSTYptdi4czg/exec';
 
 exports.handler = async function(event, context) {
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS'
+    };
+
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 204, headers, body: '' };
+    }
+
     // GET - fetch all partners
     if (event.httpMethod === 'GET') {
         try {
             const response = await fetch(`${API_BASE}?action=getPartners`);
             const data = await response.json();
-            
+
             return {
                 statusCode: 200,
+                headers,
                 body: JSON.stringify(data)
             };
         } catch (error) {
             return {
                 statusCode: 200,
+                headers,
                 body: JSON.stringify({ logos: [] })
             };
         }
@@ -31,6 +44,7 @@ exports.handler = async function(event, context) {
             if (!url || !name) {
                 return {
                     statusCode: 400,
+                    headers,
                     body: JSON.stringify({ error: 'URL and name are required' })
                 };
             }
@@ -46,6 +60,7 @@ exports.handler = async function(event, context) {
             if (result.error) {
                 return {
                     statusCode: 400,
+                    headers,
                     body: JSON.stringify({ error: result.error })
                 };
             }
@@ -56,6 +71,7 @@ exports.handler = async function(event, context) {
 
             return {
                 statusCode: 200,
+                headers,
                 body: JSON.stringify({
                     success: true,
                     logos: getData.logos || []
@@ -65,6 +81,7 @@ exports.handler = async function(event, context) {
             console.error('Add partner error:', error);
             return {
                 statusCode: 500,
+                headers,
                 body: JSON.stringify({ error: 'Failed to add partner: ' + error.message })
             };
         }
@@ -74,32 +91,12 @@ exports.handler = async function(event, context) {
     if (event.httpMethod === 'DELETE') {
         try {
             const data = JSON.parse(event.body);
-            const { id, deleteAll } = data;
-
-            if (deleteAll) {
-                // Clear all partners
-                const getResponse = await fetch(`${API_BASE}?action=getPartners`);
-                const getData = await getResponse.json();
-                
-                if (getData.logos && Array.isArray(getData.logos)) {
-                    for (const logo of getData.logos) {
-                        await fetch(`${API_BASE}?action=deletePartner`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ name: logo.name })
-                        });
-                    }
-                }
-                
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify({ success: true, logos: [] })
-                };
-            }
+            const { id } = data;
 
             if (!id) {
                 return {
                     statusCode: 400,
+                    headers,
                     body: JSON.stringify({ error: 'ID is required' })
                 };
             }
@@ -107,11 +104,12 @@ exports.handler = async function(event, context) {
             // Get partners to find the name
             const getResponse = await fetch(`${API_BASE}?action=getPartners`);
             const getData = await getResponse.json();
-            
-            const partner = (getData.logos || []).find(p => p.id === id || p.id === parseInt(id));
+
+            const partner = (getData.logos || []).find(p => p.id === id);
             if (!partner) {
                 return {
                     statusCode: 404,
+                    headers,
                     body: JSON.stringify({ error: 'Partner not found' })
                 };
             }
@@ -127,6 +125,7 @@ exports.handler = async function(event, context) {
             if (result.error) {
                 return {
                     statusCode: 400,
+                    headers,
                     body: JSON.stringify({ error: result.error })
                 };
             }
@@ -137,6 +136,7 @@ exports.handler = async function(event, context) {
 
             return {
                 statusCode: 200,
+                headers,
                 body: JSON.stringify({
                     success: true,
                     logos: refreshData.logos || []
@@ -146,6 +146,7 @@ exports.handler = async function(event, context) {
             console.error('Delete partner error:', error);
             return {
                 statusCode: 500,
+                headers,
                 body: JSON.stringify({ error: 'Failed to delete partner: ' + error.message })
             };
         }
@@ -153,6 +154,7 @@ exports.handler = async function(event, context) {
 
     return {
         statusCode: 405,
+        headers,
         body: JSON.stringify({ error: 'Method not allowed' })
     };
 };
