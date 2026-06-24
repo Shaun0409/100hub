@@ -1,35 +1,8 @@
 // netlify/functions/signup.js
-// Saves member data to members.json
+// Saves member data to Google Sheets via Sheet.best
 
-const fs = require('fs');
-const path = require('path');
-
-// Path to members.json
-const MEMBERS_FILE = path.join(__dirname, '..', '..', 'members.json');
-
-// Helper to read members
-function readMembers() {
-    try {
-        if (fs.existsSync(MEMBERS_FILE)) {
-            const data = fs.readFileSync(MEMBERS_FILE, 'utf8');
-            return JSON.parse(data);
-        }
-    } catch (error) {
-        console.error('Error reading members file:', error);
-    }
-    return { members: [], count: 3 };
-}
-
-// Helper to write members
-function writeMembers(data) {
-    try {
-        fs.writeFileSync(MEMBERS_FILE, JSON.stringify(data, null, 2));
-        return true;
-    } catch (error) {
-        console.error('Error writing members file:', error);
-        return false;
-    }
-}
+// ⚠️ REPLACE THIS WITH YOUR ACTUAL SHEET.BEST URL
+const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Members';
 
 exports.handler = async function(event, context) {
     const headers = {
@@ -61,58 +34,50 @@ exports.handler = async function(event, context) {
             };
         }
 
-        // Read existing members
-        const membersData = readMembers();
-
-        // Check if already 100 members
-        if (membersData.count >= 100) {
-            return {
-                statusCode: 400,
-                headers,
-                body: JSON.stringify({ error: 'Community is full! We\'ve reached 100 members.' })
-            };
-        }
-
         // Check if email already exists
-        const existingMember = membersData.members.find(m => m.email === email);
-        if (existingMember) {
-            return {
-                statusCode: 400,
-                headers,
-                body: JSON.stringify({ error: 'This email is already registered.' })
-            };
+        const checkResponse = await fetch(SHEET_BEST_API);
+        if (checkResponse.ok) {
+            const existingMembers = await checkResponse.json();
+            if (Array.isArray(existingMembers)) {
+                const emailExists = existingMembers.some(m => m.email === email);
+                if (emailExists) {
+                    return {
+                        statusCode: 400,
+                        headers,
+                        body: JSON.stringify({ error: 'This email is already registered.' })
+                    };
+                }
+            }
         }
 
-        // Add new member
-        const newMember = {
-            id: 'member_' + Date.now(),
-            timestamp: new Date().toISOString(),
-            name: name,
-            email: email,
-            role: role,
-            message: message || ''
-        };
+        // Save to Google Sheets via Sheet.best
+        const response = await fetch(SHEET_BEST_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                timestamp: new Date().toISOString(),
+                name: name,
+                email: email,
+                role: role,
+                message: message || ''
+            })
+        });
 
-        membersData.members.push(newMember);
-        membersData.count += 1;
-
-        // Save to file
-        const saved = writeMembers(membersData);
-
-        if (!saved) {
-            return {
-                statusCode: 500,
-                headers,
-                body: JSON.stringify({ error: 'Failed to save member data' })
-            };
+        if (!response.ok) {
+            throw new Error('Failed to save to Google Sheets');
         }
+
+        // Get updated count
+        const countResponse = await fetch(SHEET_BEST_API);
+        const members = await countResponse.json();
+        const count = Array.isArray(members) ? members.length + 3 : 3;
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
                 success: true,
-                count: membersData.count,
+                count: count,
                 message: 'Successfully joined the community!'
             })
         };

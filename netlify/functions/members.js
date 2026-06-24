@@ -1,12 +1,10 @@
 // netlify/functions/members.js
-// Reads members from members.json
+// Fetches members from Google Sheets via Sheet.best
 
-const fs = require('fs');
-const path = require('path');
+// ⚠️ REPLACE THIS WITH YOUR ACTUAL SHEET.BEST URL
+const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Members';
 
-const MEMBERS_FILE = path.join(__dirname, '..', '..', 'members.json');
-
-// Default owners
+// Default owners (first 3 members)
 const DEFAULT_OWNERS = [
     {
         id: 'owner_1',
@@ -34,18 +32,6 @@ const DEFAULT_OWNERS = [
     }
 ];
 
-function readMembers() {
-    try {
-        if (fs.existsSync(MEMBERS_FILE)) {
-            const data = fs.readFileSync(MEMBERS_FILE, 'utf8');
-            return JSON.parse(data);
-        }
-    } catch (error) {
-        console.error('Error reading members file:', error);
-    }
-    return { members: [], count: 0 };
-}
-
 exports.handler = async function(event, context) {
     const headers = {
         'Access-Control-Allow-Origin': '*',
@@ -66,18 +52,33 @@ exports.handler = async function(event, context) {
     }
 
     try {
-        const data = readMembers();
+        const response = await fetch(SHEET_BEST_API);
+        let members = [];
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (Array.isArray(data)) {
+                members = data;
+            }
+        }
+
+        // Combine owners with sheet members
         const allMembers = [...DEFAULT_OWNERS];
         const existingEmails = new Set(DEFAULT_OWNERS.map(m => m.email.toLowerCase()));
 
-        if (data.members && Array.isArray(data.members)) {
-            data.members.forEach(m => {
-                if (m.email && !existingEmails.has(m.email.toLowerCase())) {
-                    allMembers.push(m);
-                    existingEmails.add(m.email.toLowerCase());
-                }
-            });
-        }
+        members.forEach(m => {
+            if (m.email && !existingEmails.has(m.email.toLowerCase())) {
+                allMembers.push({
+                    id: m.id || 'member_' + Date.now(),
+                    timestamp: m.timestamp || new Date().toISOString(),
+                    name: m.name || 'Unknown',
+                    email: m.email || '',
+                    role: m.role || 'Member',
+                    message: m.message || ''
+                });
+                existingEmails.add(m.email.toLowerCase());
+            }
+        });
 
         return {
             statusCode: 200,

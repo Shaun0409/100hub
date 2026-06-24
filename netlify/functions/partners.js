@@ -1,32 +1,8 @@
 // netlify/functions/partners.js
-// Manages partners via partners.json
+// Manages partners via Google Sheets via Sheet.best
 
-const fs = require('fs');
-const path = require('path');
-
-const PARTNERS_FILE = path.join(__dirname, '..', '..', 'partners.json');
-
-function readPartners() {
-    try {
-        if (fs.existsSync(PARTNERS_FILE)) {
-            const data = fs.readFileSync(PARTNERS_FILE, 'utf8');
-            return JSON.parse(data);
-        }
-    } catch (error) {
-        console.error('Error reading partners file:', error);
-    }
-    return { logos: [] };
-}
-
-function writePartners(data) {
-    try {
-        fs.writeFileSync(PARTNERS_FILE, JSON.stringify(data, null, 2));
-        return true;
-    } catch (error) {
-        console.error('Error writing partners file:', error);
-        return false;
-    }
-}
+// ⚠️ REPLACE THIS WITH YOUR ACTUAL SHEET.BEST URL
+const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Partners';
 
 exports.handler = async function(event, context) {
     const headers = {
@@ -42,11 +18,19 @@ exports.handler = async function(event, context) {
     // GET - fetch all partners
     if (event.httpMethod === 'GET') {
         try {
-            const data = readPartners();
+            const response = await fetch(SHEET_BEST_API);
+            if (response.ok) {
+                const data = await response.json();
+                return {
+                    statusCode: 200,
+                    headers,
+                    body: JSON.stringify({ logos: Array.isArray(data) ? data : [] })
+                };
+            }
             return {
                 statusCode: 200,
                 headers,
-                body: JSON.stringify(data)
+                body: JSON.stringify({ logos: [] })
             };
         } catch (error) {
             return {
@@ -70,20 +54,30 @@ exports.handler = async function(event, context) {
                 };
             }
 
-            const partnersData = readPartners();
-            partnersData.logos.push({
-                id: 'partner_' + Date.now(),
-                name: name,
-                url: url
+            const response = await fetch(SHEET_BEST_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: 'partner_' + Date.now(),
+                    name: name,
+                    url: url
+                })
             });
-            writePartners(partnersData);
+
+            if (!response.ok) {
+                throw new Error('Failed to add partner');
+            }
+
+            // Get updated list
+            const getResponse = await fetch(SHEET_BEST_API);
+            const data = await getResponse.json();
 
             return {
                 statusCode: 200,
                 headers,
                 body: JSON.stringify({
                     success: true,
-                    logos: partnersData.logos
+                    logos: Array.isArray(data) ? data : []
                 })
             };
         } catch (error) {
@@ -109,8 +103,11 @@ exports.handler = async function(event, context) {
                 };
             }
 
-            const partnersData = readPartners();
-            const partnerToDelete = partnersData.logos.find(p => p.id === id);
+            // Find the partner to delete
+            const getResponse = await fetch(SHEET_BEST_API);
+            const partners = await getResponse.json();
+
+            const partnerToDelete = Array.isArray(partners) ? partners.find(p => p.id === id) : null;
             if (!partnerToDelete) {
                 return {
                     statusCode: 404,
@@ -119,15 +116,25 @@ exports.handler = async function(event, context) {
                 };
             }
 
-            partnersData.logos = partnersData.logos.filter(p => p.id !== id);
-            writePartners(partnersData);
+            // Delete from Sheet.best
+            const deleteResponse = await fetch(`${SHEET_BEST_API}/${partnerToDelete.id}`, {
+                method: 'DELETE'
+            });
+
+            if (!deleteResponse.ok) {
+                throw new Error('Failed to delete partner');
+            }
+
+            // Get updated list
+            const refreshResponse = await fetch(SHEET_BEST_API);
+            const data = await refreshResponse.json();
 
             return {
                 statusCode: 200,
                 headers,
                 body: JSON.stringify({
                     success: true,
-                    logos: partnersData.logos
+                    logos: Array.isArray(data) ? data : []
                 })
             };
         } catch (error) {

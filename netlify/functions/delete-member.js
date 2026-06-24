@@ -1,32 +1,8 @@
 // netlify/functions/delete-member.js
-// Deletes a member from members.json
+// Deletes a member from Google Sheets via Sheet.best
 
-const fs = require('fs');
-const path = require('path');
-
-const MEMBERS_FILE = path.join(__dirname, '..', '..', 'members.json');
-
-function readMembers() {
-    try {
-        if (fs.existsSync(MEMBERS_FILE)) {
-            const data = fs.readFileSync(MEMBERS_FILE, 'utf8');
-            return JSON.parse(data);
-        }
-    } catch (error) {
-        console.error('Error reading members file:', error);
-    }
-    return { members: [], count: 0 };
-}
-
-function writeMembers(data) {
-    try {
-        fs.writeFileSync(MEMBERS_FILE, JSON.stringify(data, null, 2));
-        return true;
-    } catch (error) {
-        console.error('Error writing members file:', error);
-        return false;
-    }
-}
+// ⚠️ REPLACE THIS WITH YOUR ACTUAL SHEET.BEST URL
+const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Members';
 
 exports.handler = async function(event, context) {
     const headers = {
@@ -58,9 +34,14 @@ exports.handler = async function(event, context) {
             };
         }
 
-        const membersData = readMembers();
+        // Get all members from Sheet.best
+        const getResponse = await fetch(SHEET_BEST_API);
+        if (!getResponse.ok) {
+            throw new Error('Failed to fetch members');
+        }
 
-        if (!membersData.members || membersData.members.length === 0) {
+        const members = await getResponse.json();
+        if (!Array.isArray(members)) {
             return {
                 statusCode: 404,
                 headers,
@@ -68,7 +49,8 @@ exports.handler = async function(event, context) {
             };
         }
 
-        const memberToDelete = membersData.members.find(m => m.id === id);
+        // Find member by ID
+        const memberToDelete = members.find(m => m.id === id || m.id === parseInt(id));
         if (!memberToDelete) {
             return {
                 statusCode: 404,
@@ -77,11 +59,24 @@ exports.handler = async function(event, context) {
             };
         }
 
-        // Filter out the member
-        membersData.members = membersData.members.filter(m => m.id !== id);
-        membersData.count = membersData.members.length;
+        // Check if it's a default owner by email
+        const ownerEmails = ['khocypixs@gmail.com', 'mpilo1@gmail.com', 'shaun@example.com'];
+        if (ownerEmails.includes(memberToDelete.email)) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'Cannot delete default owners' })
+            };
+        }
 
-        writeMembers(membersData);
+        // Delete from Sheet.best
+        const deleteResponse = await fetch(`${SHEET_BEST_API}/${memberToDelete.id}`, {
+            method: 'DELETE'
+        });
+
+        if (!deleteResponse.ok) {
+            throw new Error('Failed to delete member');
+        }
 
         return {
             statusCode: 200,
