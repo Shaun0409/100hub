@@ -270,12 +270,17 @@
             flex-wrap: wrap;
             align-items: center;
         }
-        .mediakit-upload .upload-form input[type="file"] {
+        .mediakit-upload .upload-form input[type="url"] {
             flex: 1;
-            padding: 10px;
+            padding: 10px 16px;
             border: 1px solid var(--gray-medium);
             border-radius: var(--radius-sm);
-            min-width: 200px;
+            min-width: 250px;
+            font-size: 14px;
+        }
+        .mediakit-upload .upload-form input[type="url"]:focus {
+            outline: none;
+            border-color: var(--red);
         }
         .mediakit-upload .upload-progress {
             display: none;
@@ -337,7 +342,7 @@
             .add-partner-form input { width: 100%; }
             .partner-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
             .mediakit-upload .upload-form { flex-direction: column; }
-            .mediakit-upload .upload-form input[type="file"] { width: 100%; }
+            .mediakit-upload .upload-form input[type="url"] { width: 100%; }
         }
     </style>
 </head>
@@ -480,13 +485,13 @@
                     </div>
 
                     <form id="mediaKitForm" class="upload-form" style="margin-top:16px;">
-                        <input type="url" id="mediaKitUrl" placeholder="Paste Media Kit URL (Cloudinary, Google Drive, etc.)" style="flex:1; padding:10px; border:1px solid var(--gray-medium); border-radius:var(--radius-sm); min-width:250px;" required />
+                        <input type="url" id="mediaKitUrl" placeholder="Paste Media Kit URL (Cloudinary, Google Drive, etc.)" required />
                         <button type="submit" class="btn-primary">
                             <i class="fa-regular fa-upload"></i> Save URL
                         </button>
                     </form>
                     <div id="mediaKitProgress" style="display:none; margin-top:12px; padding:10px; background:var(--gray-light); border-radius:var(--radius-sm);">
-                        <span class="loader-small" style="display:inline-block; width:20px; height:20px; border:2px solid var(--gray-medium); border-top:2px solid var(--red); border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle; margin-right:12px;"></span>
+                        <span class="loader-small"></span>
                         <span style="color:var(--text-secondary);">Saving...</span>
                     </div>
                 </div>
@@ -502,7 +507,9 @@
     <script>
         const API_BASE = '/.netlify/functions';
 
-        // Tabs
+        // ==========================================
+        // TABS
+        // ==========================================
         document.querySelectorAll('.dashboard-tabs button').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.dashboard-tabs button').forEach(b => b.classList.remove('active'));
@@ -522,6 +529,7 @@
                 const response = await fetch(`${API_BASE}/members`);
                 return await response.json();
             } catch (error) {
+                console.error('Fetch members error:', error);
                 return { members: [], count: 0 };
             }
         }
@@ -529,9 +537,11 @@
         async function renderMembers() {
             const tbody = document.getElementById('membersTableBody');
             const data = await fetchMembers();
+            
             document.getElementById('totalMembers').textContent = data.count || 0;
             const progress = Math.round(((data.count || 0) / 100) * 100);
             document.getElementById('roadProgress').textContent = progress + '%';
+            
             if (!data.members || data.members.length === 0) {
                 tbody.innerHTML = `
                     <tr>
@@ -545,6 +555,7 @@
                 `;
                 return;
             }
+            
             tbody.innerHTML = data.members.map((member, index) => `
                 <tr>
                     <td>${index + 1}</td>
@@ -553,7 +564,9 @@
                     <td><span class="member-role">${member.role}</span></td>
                     <td>${member.timestamp ? new Date(member.timestamp).toLocaleDateString() : 'N/A'}</td>
                     <td style="text-align:center;">
-                        <button class="delete-btn" onclick="deleteMember('${member.id}')"><i class="fa-regular fa-trash-can"></i></button>
+                        <button class="delete-btn" onclick="deleteMember('${member.id}')" title="Delete member">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -568,13 +581,20 @@
                     body: JSON.stringify({ id })
                 });
                 const result = await response.json();
-                if (result.success) { showToast('Member deleted.', 'success'); renderMembers(); }
-                else showToast('Failed to delete.', 'error');
-            } catch (error) { showToast('Error deleting.', 'error'); }
+                if (result.success) {
+                    showToast('Member deleted.', 'success');
+                    renderMembers();
+                } else {
+                    showToast('Failed to delete.', 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                showToast('Error deleting.', 'error');
+            }
         }
 
         async function confirmDeleteAll() {
-            if (!confirm('Delete ALL members?')) return;
+            if (!confirm('Delete ALL members? This cannot be undone.')) return;
             try {
                 const response = await fetch(`${API_BASE}/delete-member`, {
                     method: 'POST',
@@ -582,18 +602,31 @@
                     body: JSON.stringify({ deleteAll: true })
                 });
                 const result = await response.json();
-                if (result.success) { showToast('All members deleted.', 'success'); renderMembers(); }
-                else showToast('Failed.', 'error');
-            } catch (error) { showToast('Error.', 'error'); }
+                if (result.success) {
+                    showToast('All members deleted.', 'success');
+                    renderMembers();
+                } else {
+                    showToast('Failed to delete members.', 'error');
+                }
+            } catch (error) {
+                console.error('Delete all error:', error);
+                showToast('Error deleting members.', 'error');
+            }
         }
 
         async function exportCSV() {
             try {
                 const data = await fetchMembers();
-                if (!data.members || data.members.length === 0) { showToast('No members to export.', 'error'); return; }
+                if (!data.members || data.members.length === 0) {
+                    showToast('No members to export.', 'error');
+                    return;
+                }
                 const headers = ['Name', 'Email', 'Role', 'Message', 'Joined'];
                 const rows = data.members.map(m => [
-                    `"${m.name}"`, `"${m.email}"`, `"${m.role}"`, `"${m.message || ''}"`,
+                    `"${m.name || ''}"`,
+                    `"${m.email || ''}"`,
+                    `"${m.role || ''}"`,
+                    `"${m.message || ''}"`,
                     `"${m.timestamp ? new Date(m.timestamp).toLocaleString() : ''}"`
                 ]);
                 const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -605,17 +638,23 @@
                 a.click();
                 URL.revokeObjectURL(url);
                 showToast('CSV exported!', 'success');
-            } catch (error) { showToast('Error exporting.', 'error'); }
+            } catch (error) {
+                console.error('Export error:', error);
+                showToast('Error exporting.', 'error');
+            }
         }
 
-        function refreshMembers() { renderMembers(); showToast('Refreshed!', 'success'); }
+        function refreshMembers() {
+            renderMembers();
+            showToast('Refreshed!', 'success');
+        }
 
         // ==========================================
-        // PARTNERS — Cloudinary API
+        // PARTNERS
         // ==========================================
         async function loadPartners() {
             try {
-                const response = await fetch('/.netlify/functions/partners');
+                const response = await fetch(`${API_BASE}/partners`);
                 const data = await response.json();
                 const grid = document.getElementById('partnerGrid');
                 
@@ -624,7 +663,7 @@
                         <div class="empty-state" style="grid-column:1/-1;">
                             <i class="fa-regular fa-image"></i>
                             <p>No partners added yet.</p>
-                            <p style="font-size:12px;">Upload logos to Cloudinary → <strong>partners</strong> folder</p>
+                            <p style="font-size:12px;">Add a partner using the form below.</p>
                         </div>
                     `;
                     document.getElementById('totalPartners').textContent = '0';
@@ -636,9 +675,9 @@
                     <div class="partner-card">
                         <img src="${logo.url}" alt="${logo.name}" onerror="this.style.display='none'" />
                         <div class="partner-name">${logo.name}</div>
-                        <div style="font-size:10px; color:var(--text-muted); margin-top:4px; word-break:break-all;">
-                            ${logo.id}
-                        </div>
+                        <button class="remove-partner" onclick="deletePartner('${logo.id}')" title="Remove partner">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
                     </div>
                 `).join('');
             } catch (error) {
@@ -648,9 +687,16 @@
         }
 
         async function addPartner() {
-            const name = document.getElementById('partnerName').value.trim();
-            const url = document.getElementById('partnerUrl').value.trim();
-            if (!name || !url) { showToast('Please enter both name and URL.', 'error'); return; }
+            const nameInput = document.getElementById('partnerName');
+            const urlInput = document.getElementById('partnerUrl');
+            const name = nameInput.value.trim();
+            const url = urlInput.value.trim();
+            
+            if (!name || !url) {
+                showToast('Please enter both name and URL.', 'error');
+                return;
+            }
+            
             try {
                 const response = await fetch(`${API_BASE}/partners`, {
                     method: 'POST',
@@ -658,12 +704,18 @@
                     body: JSON.stringify({ name, url })
                 });
                 const result = await response.json();
-                if (result.success) { showToast('Partner added!', 'success');
-                    document.getElementById('partnerName').value = '';
-                    document.getElementById('partnerUrl').value = '';
+                if (result.success) {
+                    showToast('Partner added!', 'success');
+                    nameInput.value = '';
+                    urlInput.value = '';
                     loadPartners();
-                } else showToast('Failed to add.', 'error');
-            } catch (error) { showToast('Error adding.', 'error'); }
+                } else {
+                    showToast('Failed to add partner.', 'error');
+                }
+            } catch (error) {
+                console.error('Add partner error:', error);
+                showToast('Error adding partner.', 'error');
+            }
         }
 
         async function deletePartner(id) {
@@ -675,9 +727,37 @@
                     body: JSON.stringify({ id })
                 });
                 const result = await response.json();
-                if (result.success) { showToast('Partner removed.', 'success'); loadPartners(); }
-                else showToast('Failed to remove.', 'error');
-            } catch (error) { showToast('Error removing.', 'error'); }
+                if (result.success) {
+                    showToast('Partner removed.', 'success');
+                    loadPartners();
+                } else {
+                    showToast('Failed to remove partner.', 'error');
+                }
+            } catch (error) {
+                console.error('Delete partner error:', error);
+                showToast('Error removing partner.', 'error');
+            }
+        }
+
+        async function clearAllPartners() {
+            if (!confirm('Remove ALL partners?')) return;
+            try {
+                const response = await fetch(`${API_BASE}/partners`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deleteAll: true })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('All partners removed.', 'success');
+                    loadPartners();
+                } else {
+                    showToast('Failed to remove partners.', 'error');
+                }
+            } catch (error) {
+                console.error('Clear partners error:', error);
+                showToast('Error removing partners.', 'error');
+            }
         }
 
         // ==========================================
@@ -685,48 +765,92 @@
         // ==========================================
         async function checkMediaKit() {
             const status = document.getElementById('mediaKitStatus');
+            const downloadLink = document.getElementById('mediaKitDownloadLink');
+            
             try {
-                const response = await fetch('/media-kit.pdf', { method: 'HEAD' });
+                const response = await fetch(`${API_BASE}/upload-media-kit`);
                 if (response.ok) {
-                    const fileSize = response.headers.get('Content-Length');
-                    const sizeMB = fileSize ? (parseInt(fileSize) / 1024 / 1024).toFixed(2) : 'unknown';
-                    status.innerHTML = `<span style="color:#4caf50;">✅ PDF available (${sizeMB} MB)</span>`;
-                } else {
-                    status.innerHTML = `<span style="color:#ff9800;">⚠️ No Media Kit uploaded yet</span>`;
+                    const data = await response.json();
+                    if (data.url) {
+                        status.innerHTML = `<span style="color:#4caf50;">✅ Media Kit available</span>`;
+                        downloadLink.style.display = 'inline-flex';
+                        downloadLink.href = data.url;
+                        return;
+                    }
                 }
+                status.innerHTML = `<span style="color:#ff9800;">⚠️ No Media Kit URL set</span>`;
+                downloadLink.style.display = 'none';
             } catch (error) {
+                console.error('Check media kit error:', error);
                 status.innerHTML = `<span style="color:#ff4444;">❌ Could not check</span>`;
+                downloadLink.style.display = 'none';
             }
         }
-            document.getElementById('mediaKitBtn').addEventListener('click', function(e) {
+
+        // Media Kit Form
+        const mediaKitForm = document.getElementById('mediaKitForm');
+        if (mediaKitForm) {
+            mediaKitForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                // Fetch the media kit URL from the backend
-                fetch('/.netlify/functions/upload-media-kit')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.url) {
-                            // Open the URL in a new tab (will download PDF)
-                            window.open(data.url, '_blank');
-                        } else {
-                            alert('📄 Media Kit coming soon. Please check back later.');
-                        }
-                    })
-                    .catch(() => {
-                        alert('📄 Media Kit coming soon. Please check back later.');
-                    });
+                const urlInput = document.getElementById('mediaKitUrl');
+                const url = urlInput.value.trim();
+                
+                if (!url) {
+                    showToast('Please enter a URL.', 'error');
+                    return;
+                }
+                
+                // Validate URL
+                try {
+                    new URL(url);
+                } catch (e) {
+                    showToast('Please enter a valid URL (e.g., https://...).', 'error');
+                    return;
+                }
+                
+                const progress = document.getElementById('mediaKitProgress');
+                progress.style.display = 'block';
+                
+                fetch(`${API_BASE}/upload-media-kit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    progress.style.display = 'none';
+                    if (result.success) {
+                        showToast('Media Kit URL saved successfully!', 'success');
+                        checkMediaKit();
+                        urlInput.value = '';
+                    } else {
+                        showToast(result.error || 'Failed to save.', 'error');
+                    }
+                })
+                .catch(error => {
+                    progress.style.display = 'none';
+                    console.error('Media kit error:', error);
+                    showToast('Error saving media kit.', 'error');
+                });
             });
+        } else {
+            console.warn('Media Kit form not found in the DOM.');
+        }
 
         // ==========================================
         // TOAST
         // ==========================================
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
+            if (!toast) return;
             toast.textContent = message;
             toast.className = `toast ${type}`;
             toast.classList.add('show');
             clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
 
         // ==========================================
@@ -737,6 +861,8 @@
             loadPartners();
             checkMediaKit();
         });
+
+        console.log('📊 100 HUB Dashboard loaded.');
     </script>
 </body>
 </html>
