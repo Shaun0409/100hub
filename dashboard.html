@@ -432,26 +432,32 @@
                     <button class="btn-outline" onclick="loadPartners()">
                         <i class="fa-solid fa-rotate"></i> Refresh
                     </button>
+                    <a href="https://cloudinary.com/console/media_library/folder/partners" target="_blank" class="btn-outline">
+                        <i class="fa-regular fa-cloud"></i> Manage in Cloudinary
+                    </a>
                 </div>
+
                 <div class="partner-grid" id="partnerGrid">
                     <div class="empty-state" style="grid-column:1/-1;">
                         <i class="fa-regular fa-image"></i>
                         <p>Loading partners...</p>
                     </div>
                 </div>
-                <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-top:30px; margin-bottom:16px;">Add New Partner</h3>
-                <div class="add-partner-form">
-                    <input type="text" id="partnerName" placeholder="Partner Name" />
-                    <input type="text" id="partnerUrl" placeholder="Logo URL (e.g., /images/partner.png)" />
-                    <button class="btn-primary" onclick="addPartner()">
-                        <i class="fa-regular fa-plus"></i> Add Partner
-                    </button>
-                </div>
-                <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">
-                    💡 Upload logo images to the website folder first, then enter the file path (e.g., /images/partner.png)
-                </p>
-            </div>
 
+                <div style="background:var(--gray-light); border-radius:var(--radius-sm); padding:20px; margin-top:20px;">
+                    <h4 style="font-size:14px; margin-bottom:8px;">📸 How to Add Partner Logos</h4>
+                    <ol style="font-size:13px; color:var(--text-secondary); line-height:1.8; padding-left:20px;">
+                        <li>Go to <a href="https://cloudinary.com/console/media_library/folder/partners" target="_blank" style="color:var(--red);">Cloudinary Media Library</a></li>
+                        <li>Create a folder called <strong>partners</strong> (if it doesn't exist)</li>
+                        <li>Upload your partner logo images (PNG, JPG, or JPEG)</li>
+                        <li>Refresh this page — logos will appear automatically</li>
+                        <li>To remove a logo, delete it from Cloudinary</li>
+                    </ol>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">
+                        💡 Cloudinary automatically optimizes and serves images via CDN.
+                    </p>
+                </div>
+            </div>
             <!-- Tab: Media Kit -->
             <div class="tab-content" id="tab-mediakit">
                 <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:16px;">Media Kit</h3>
@@ -601,32 +607,40 @@
         function refreshMembers() { renderMembers(); showToast('Refreshed!', 'success'); }
 
         // ==========================================
-        // PARTNERS
+        // PARTNERS — Cloudinary API
         // ==========================================
         async function loadPartners() {
             try {
-                const response = await fetch(`${API_BASE}/partners`);
+                const response = await fetch('/.netlify/functions/partners');
                 const data = await response.json();
                 const grid = document.getElementById('partnerGrid');
+                
                 if (!data.logos || data.logos.length === 0) {
                     grid.innerHTML = `
                         <div class="empty-state" style="grid-column:1/-1;">
                             <i class="fa-regular fa-image"></i>
                             <p>No partners added yet.</p>
+                            <p style="font-size:12px;">Upload logos to Cloudinary → <strong>partners</strong> folder</p>
                         </div>
                     `;
                     document.getElementById('totalPartners').textContent = '0';
                     return;
                 }
+                
                 document.getElementById('totalPartners').textContent = data.logos.length;
                 grid.innerHTML = data.logos.map(logo => `
                     <div class="partner-card">
                         <img src="${logo.url}" alt="${logo.name}" onerror="this.style.display='none'" />
                         <div class="partner-name">${logo.name}</div>
-                        <button class="remove-partner" onclick="deletePartner('${logo.id}')"><i class="fa-regular fa-trash-can"></i></button>
+                        <div style="font-size:10px; color:var(--text-muted); margin-top:4px; word-break:break-all;">
+                            ${logo.id}
+                        </div>
                     </div>
                 `).join('');
-            } catch (error) { showToast('Error loading partners.', 'error'); }
+            } catch (error) {
+                console.error('Error loading partners:', error);
+                showToast('Error loading partners.', 'error');
+            }
         }
 
         async function addPartner() {

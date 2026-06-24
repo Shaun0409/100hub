@@ -1,50 +1,68 @@
-const fs = require('fs');
-const path = require('path');
-const MEMBERS_FILE = path.join(__dirname, '..', '..', 'members.json');
+// netlify/functions/delete-member.js
+// Deletes a member from Google Sheets via Sheet.best
 
-function readMembers() {
-    try {
-        if (fs.existsSync(MEMBERS_FILE)) {
-            const data = fs.readFileSync(MEMBERS_FILE, 'utf8');
-            return JSON.parse(data);
-        }
-    } catch (error) {
-        return { members: [], count: 0 };
-    }
-    return { members: [], count: 0 };
-}
-
-function writeMembers(data) {
-    try {
-        fs.writeFileSync(MEMBERS_FILE, JSON.stringify(data, null, 2));
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
+// Replace with your Sheet.best connection URL
+const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/ea89e6d2-3087-4506-ab5b-31e9802bcd62';
 
 exports.handler = async function(event, context) {
     if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ error: 'Method not allowed' })
+        };
     }
+
     try {
         const data = JSON.parse(event.body);
-        const membersData = readMembers();
-        if (data.deleteAll) {
-            membersData.members = [];
-            membersData.count = 0;
-            writeMembers(membersData);
-            return { statusCode: 200, body: JSON.stringify({ success: true }) };
+        const { id, deleteAll } = data;
+
+        // Get all members
+        const response = await fetch(SHEET_BEST_API);
+        if (!response.ok) {
+            throw new Error('Failed to fetch members');
         }
-        const { id } = data;
+
+        let members = await response.json();
+
+        if (deleteAll) {
+            // Delete all members - we need to delete each row individually
+            for (const member of members) {
+                await fetch(`${SHEET_BEST_API}/${member.id}`, {
+                    method: 'DELETE'
+                });
+            }
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ success: true, message: 'All members deleted' })
+            };
+        }
+
+        // Delete single member by ID
         if (!id) {
-            return { statusCode: 400, body: JSON.stringify({ error: 'Member ID is required' }) };
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Member ID is required' })
+            };
         }
-        membersData.members = membersData.members.filter(m => m.id !== parseInt(id));
-        membersData.count = membersData.members.length;
-        writeMembers(membersData);
-        return { statusCode: 200, body: JSON.stringify({ success: true }) };
+
+        const deleteResponse = await fetch(`${SHEET_BEST_API}/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (!deleteResponse.ok) {
+            throw new Error('Failed to delete member');
+        }
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ success: true, message: 'Member deleted' })
+        };
+
     } catch (error) {
-        return { statusCode: 500, body: JSON.stringify({ error: 'Server error' }) };
+        console.error('Delete error:', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Failed to delete member' })
+        };
     }
 };
