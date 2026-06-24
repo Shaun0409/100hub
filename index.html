@@ -871,12 +871,12 @@
             const memberCount = await getMemberCount();
             updateCounterDisplay(memberCount);
             fetchFeed();
+            
+            console.log('🎯 100 HUB — Website Loaded');
+            console.log('📸 Feed ID:', BEHOLD_FEED_ID);
+            console.log('👥 Member Count:', memberCount, '/', MAX_MEMBERS);
+            console.log('🤝 Partner Logos:', partnerLogos.length);
         });
-
-        console.log('🎯 100 HUB — Website Loaded');
-        console.log('📸 Feed ID:', BEHOLD_FEED_ID);
-        console.log('👥 Member Count:', await getMemberCount(), '/', MAX_MEMBERS);
-        console.log('🤝 Partner Logos:', partnerLogos.length);
     </script>
 
     <!-- ==================== POST ID TOOL ==================== -->
