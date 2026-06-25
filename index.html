@@ -159,13 +159,13 @@
                     <div class="road-to-100">
                         <span class="road-label">ROAD TO 100</span>
                         <div class="road-counter">
-                            <span class="road-number" id="memberCount">3</span>
+                            <span class="road-number" id="memberCount">...</span>
                             <span class="road-total">/ 100</span>
                         </div>
                         <div class="road-progress">
-                            <div class="road-progress-bar" id="progressBar" style="width: 3%;"></div>
+                            <div class="road-progress-bar" id="progressBar" style="width: 0%;"></div>
                         </div>
-                        <p class="road-status" id="roadStatus">3 creators have joined the journey</p>
+                        <p class="road-status" id="roadStatus">Loading members...</p>
                     </div>
 
                     <ul class="community-benefits">
@@ -253,7 +253,9 @@
                     <a href="#" class="btn-primary" id="mediaKitBtn">
                         <i class="fa-regular fa-file-pdf"></i> Request Media Kit
                     </a>
-                    <a href="#" class="btn-secondary">Start Partnership</a>
+                    <a href="#community" class="btn-secondary" id="startPartnershipBtn">
+                        Start Partnership
+                    </a>
                 </div>
                 <div class="work-contact">
                     <a href="mailto:hello@100projectsmedia.com" class="work-email">hello@100projectsmedia.com</a>
@@ -462,7 +464,14 @@
             const successMsg = document.getElementById('formSuccess');
             const submitBtn = document.getElementById('submitBtn');
 
-            if (counter) counter.textContent = count || 0;
+            if (count === null || count === undefined) {
+                if (counter) counter.textContent = '...';
+                if (progress) progress.style.width = '0%';
+                if (status) status.textContent = 'Loading members...';
+                return;
+            }
+
+            if (counter) counter.textContent = count;
             if (progress) progress.style.width = ((count || 0) / MAX_MEMBERS) * 100 + '%';
             if (status) status.textContent = (count || 0) + ' creators have joined the journey';
 
@@ -662,7 +671,6 @@
                 `;
             }).join('');
 
-            // Click ANYWHERE on the post to open modal
             document.querySelectorAll('.feed-item').forEach(item => {
                 item.addEventListener('click', function(e) {
                     if (e.target.closest('.feed-link')) return;
@@ -795,21 +803,22 @@
         });
 
         // ==========================================
-        // MEDIA KIT DOWNLOAD (Direct from Assets folder)
+        // MEDIA KIT DOWNLOAD
         // ==========================================
         document.getElementById('mediaKitBtn').addEventListener('click', function(e) {
             e.preventDefault();
-            const pdfUrl = 'Assets/media-kit.pdf';
             
-            fetch(pdfUrl, { method: 'HEAD' })
+            // Try to get the media kit URL from the dashboard (via Netlify function)
+            fetch(`${API_BASE}/media-kit`)
                 .then(response => {
                     if (response.ok) {
-                        const link = document.createElement('a');
-                        link.href = pdfUrl;
-                        link.download = '100_HUB_Media_Kit.pdf';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
+                        return response.json();
+                    }
+                    throw new Error('No media kit found');
+                })
+                .then(data => {
+                    if (data.url) {
+                        window.open(data.url, '_blank');
                     } else {
                         alert('📄 Media Kit coming soon. Please check back later.');
                     }
@@ -817,6 +826,17 @@
                 .catch(() => {
                     alert('📄 Media Kit coming soon. Please check back later.');
                 });
+        });
+
+        // ==========================================
+        // START PARTNERSHIP BUTTON
+        // ==========================================
+        document.getElementById('startPartnershipBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            const communitySection = document.getElementById('community');
+            if (communitySection) {
+                communitySection.scrollIntoView({ behavior: 'smooth' });
+            }
         });
 
         // ==========================================
@@ -866,6 +886,8 @@
         // INIT
         // ==========================================
         document.addEventListener('DOMContentLoaded', async function() {
+            updateCounterDisplay(null);
+            
             await loadArticles();
             await loadPartners();
             const memberCount = await getMemberCount();
@@ -1048,7 +1070,6 @@
             }, 3000);
         }
 
-        // Style for animations
         const toolStyle = document.createElement('style');
         toolStyle.textContent = `
             @keyframes fadeInUp {
@@ -1058,7 +1079,6 @@
         `;
         document.head.appendChild(toolStyle);
 
-        // Update list when feed changes
         const toolObserver = new MutationObserver(() => {
             const tool = document.getElementById('postIdTool');
             if (tool && tool.style.display !== 'none') {
