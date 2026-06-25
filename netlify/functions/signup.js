@@ -24,7 +24,7 @@ exports.handler = async function(event, context) {
     }
 
     try {
-        const { name, email, role, message } = JSON.parse(event.body);
+        const { name, email, role, skills, website, image1, image2, image3, status } = JSON.parse(event.body);
 
         if (!name || !email || !role) {
             return {
@@ -59,7 +59,13 @@ exports.handler = async function(event, context) {
                 name: name,
                 email: email,
                 role: role,
-                message: message || ''
+                skills: skills || '',
+                website: website || '',
+                image1: image1 || '',
+                image2: image2 || '',
+                image3: image3 || '',
+                status: status || 'pending',
+                selectedImage: ''
             })
         });
 
@@ -67,17 +73,11 @@ exports.handler = async function(event, context) {
             throw new Error('Failed to save to Google Sheets');
         }
 
-        // Get updated count
-        const countResponse = await fetch(SHEET_BEST_API);
-        const members = await countResponse.json();
-        const count = Array.isArray(members) ? members.length + 3 : 3;
-
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
                 success: true,
-                count: count,
                 message: 'Successfully joined the community!'
             })
         };

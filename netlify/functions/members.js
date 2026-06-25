@@ -4,7 +4,6 @@
 // ⚠️ REPLACE THIS WITH YOUR ACTUAL SHEET.BEST URL
 const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Members';
 
-// Default owners (first 3 members)
 const DEFAULT_OWNERS = [
     {
         id: 'owner_1',
@@ -12,7 +11,9 @@ const DEFAULT_OWNERS = [
         name: 'Lesley Khocy',
         email: 'khocypixs@gmail.com',
         role: 'Admin (Owner)',
-        message: 'Co-Founder, Visual Director, Editor In Chief'
+        skills: 'Co-Founder, Visual Director, Editor In Chief',
+        status: 'accepted',
+        selectedImage: ''
     },
     {
         id: 'owner_2',
@@ -20,7 +21,9 @@ const DEFAULT_OWNERS = [
         name: 'Mpilo Nhlapho',
         email: 'mpilo1@gmail.com',
         role: 'Admin (Owner)',
-        message: 'Founder & CBO'
+        skills: 'Founder & CBO',
+        status: 'accepted',
+        selectedImage: ''
     },
     {
         id: 'owner_3',
@@ -28,7 +31,9 @@ const DEFAULT_OWNERS = [
         name: 'Shaun Tshabalala',
         email: 'shaun@example.com',
         role: 'Admin (Developer)',
-        message: 'Lead Developer'
+        skills: 'Lead Developer',
+        status: 'accepted',
+        selectedImage: ''
     }
 ];
 
@@ -53,20 +58,26 @@ exports.handler = async function(event, context) {
 
     try {
         const response = await fetch(SHEET_BEST_API);
-        let members = [];
+        let sheetMembers = [];
         
         if (response.ok) {
             const data = await response.json();
             if (Array.isArray(data)) {
-                members = data;
+                sheetMembers = data;
             }
         }
 
+        // Get query parameters
+        const params = event.queryStringParameters || {};
+        const statusFilter = params.status || 'all';
+        const page = parseInt(params.page) || 0;
+        const limit = parseInt(params.limit) || 100;
+
         // Combine owners with sheet members
-        const allMembers = [...DEFAULT_OWNERS];
+        let allMembers = [...DEFAULT_OWNERS];
         const existingEmails = new Set(DEFAULT_OWNERS.map(m => m.email.toLowerCase()));
 
-        members.forEach(m => {
+        sheetMembers.forEach(m => {
             if (m.email && !existingEmails.has(m.email.toLowerCase())) {
                 allMembers.push({
                     id: m.id || 'member_' + Date.now(),
@@ -74,18 +85,38 @@ exports.handler = async function(event, context) {
                     name: m.name || 'Unknown',
                     email: m.email || '',
                     role: m.role || 'Member',
-                    message: m.message || ''
+                    skills: m.skills || '',
+                    website: m.website || '',
+                    image1: m.image1 || '',
+                    image2: m.image2 || '',
+                    image3: m.image3 || '',
+                    status: m.status || 'pending',
+                    selectedImage: m.selectedImage || ''
                 });
                 existingEmails.add(m.email.toLowerCase());
             }
         });
 
+        // Filter by status if specified
+        if (statusFilter !== 'all') {
+            allMembers = allMembers.filter(m => m.status === statusFilter);
+        }
+
+        // Sort by timestamp (newest first)
+        allMembers.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        // Paginate
+        const start = page * limit;
+        const end = start + limit;
+        const paginatedMembers = allMembers.slice(start, end);
+
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                members: allMembers,
-                count: allMembers.length
+                members: paginatedMembers,
+                count: allMembers.length,
+                total: allMembers.length
             })
         };
     } catch (error) {
@@ -95,7 +126,8 @@ exports.handler = async function(event, context) {
             headers,
             body: JSON.stringify({
                 members: DEFAULT_OWNERS,
-                count: DEFAULT_OWNERS.length
+                count: DEFAULT_OWNERS.length,
+                total: DEFAULT_OWNERS.length
             })
         };
     }

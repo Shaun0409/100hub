@@ -15,6 +15,14 @@
 </head>
 <body>
 
+    <!-- ==================== GLOBAL VIDEO BACKGROUND ==================== -->
+    <div class="global-video-bg">
+        <video autoplay muted loop playsinline class="global-video">
+            <source src="Assets/hero-bg.mp4" type="video/mp4" />
+        </video>
+        <div class="global-video-overlay"></div>
+    </div>
+
     <!-- ==================== NAVIGATION ==================== -->
     <nav class="navbar">
         <div class="container">
@@ -30,6 +38,7 @@
                     <a href="#about">About</a>
                     <a href="#feed">Media</a>
                     <a href="#community">Community</a>
+                    <a href="#hub">Hub</a>
                     <a href="#partners">Partners</a>
                     <a href="#work">Work</a>
                     <a href="#team">Team</a>
@@ -41,7 +50,6 @@
 
     <!-- ==================== HERO ==================== -->
     <section class="hero" id="hero">
-        <div class="hero-ambient"></div>
         <div class="container">
             <div class="hero-content">
                 <img src="Assets/100_Logo.png" alt="100 HUB" class="hero-logo-img" />
@@ -64,10 +72,10 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="hero-scroll">
+        <div class="hero-scroll">
             <span>Scroll</span>
             <div class="scroll-line"></div>
-        </div> -->
+        </div>
     </section>
 
     <!-- ==================== ABOUT ==================== -->
@@ -186,10 +194,13 @@
                             <input type="email" id="memberEmail" placeholder="Email Address" required />
                         </div>
                         <div class="form-group">
-                            <input type="text" id="memberRole" placeholder="I want to join as... (e.g., Creator, Writer, Partner, Supporter)" required />
+                            <input type="text" id="memberRole" placeholder="Role/Title (e.g., Photographer, Writer, Brand Strategist)" required />
                         </div>
                         <div class="form-group">
-                            <textarea id="memberMessage" rows="3" placeholder="Tell us about yourself (optional)"></textarea>
+                            <textarea id="memberSkills" rows="2" placeholder="Creative Focus/Skillset (e.g., Fashion Photography, Brand Strategy)"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="url" id="memberWebsite" placeholder="Website or Portfolio Link (optional)" />
                         </div>
                         <button type="submit" class="btn-primary full-width" id="submitBtn">
                             <i class="fa-regular fa-paper-plane"></i> Become a Member
@@ -209,11 +220,80 @@
         </div>
     </section>
 
+    <!-- ==================== SIGNUP MODAL ==================== -->
+    <div class="signup-modal" id="signupModal">
+        <div class="signup-modal-overlay" id="signupModalOverlay"></div>
+        <div class="signup-modal-content">
+            <button class="signup-modal-close" id="signupModalClose"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="font-family:'Playfair Display',serif; font-size:28px; margin-bottom:8px;">Become a Member</h2>
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Join the 100 HUB creative community</p>
+            <form id="signupModalForm">
+                <div class="form-group">
+                    <label>Professional Photo (3 images)</label>
+                    <input type="file" id="memberPhotos" accept="image/*" multiple required />
+                    <small style="color:var(--text-muted); font-size:11px;">Upload up to 3 images (PNG, JPG, JPEG)</small>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="modalMemberName" placeholder="Full Name" required />
+                </div>
+                <div class="form-group">
+                    <input type="email" id="modalMemberEmail" placeholder="Email Address" required />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="modalMemberRole" placeholder="Role/Title (e.g., Photographer, Writer, Brand Strategist)" required />
+                </div>
+                <div class="form-group">
+                    <textarea id="modalMemberSkills" rows="2" placeholder="Creative Focus/Skillset (e.g., Fashion Photography, Brand Strategy)"></textarea>
+                </div>
+                <div class="form-group">
+                    <input type="url" id="modalMemberWebsite" placeholder="Website or Portfolio Link (optional)" />
+                </div>
+                <button type="submit" class="btn-primary full-width" id="modalSubmitBtn">
+                    <i class="fa-regular fa-paper-plane"></i> Submit Application
+                </button>
+                <div id="modalFormSuccess" style="display:none; text-align:center; padding:20px; color:var(--red);">
+                    <i class="fa-regular fa-circle-check" style="font-size:32px; display:block; margin-bottom:12px;"></i>
+                    <p>Thank you for joining! You will receive an email to let you know that you have been accepted as a member.</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== HUB SECTION ==================== -->
+    <section class="hub-section" id="hub">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-number">04</span>
+                <h2 class="section-title">The <span class="highlight-red">Hub</span></h2>
+                <div class="section-divider">
+                    <span class="divider-line-short"></span>
+                    <span class="divider-dot"></span>
+                    <span class="divider-dot"></span>
+                    <span class="divider-dot"></span>
+                    <span class="divider-dot"></span>
+                    <span class="divider-line-short"></span>
+                </div>
+                <p class="section-subtitle">Meet our creative community</p>
+            </div>
+            <div class="hub-grid" id="hubGrid">
+                <div class="hub-loading">
+                    <div class="loader"></div>
+                    <p>Loading members...</p>
+                </div>
+            </div>
+            <div class="see-more-container" id="hubSeeMore" style="display:none;">
+                <button class="see-more-btn" onclick="loadMoreHubMembers()">
+                    See More <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
     <!-- ==================== PARTNER LOGOS ==================== -->
     <section class="partners-section" id="partners">
         <div class="container">
             <div class="section-header">
-                <span class="section-number">04</span>
+                <span class="section-number">05</span>
                 <h2 class="section-title">Trusted <span class="highlight-red">By</span></h2>
                 <div class="section-divider">
                     <span class="divider-line-short"></span>
@@ -236,7 +316,7 @@
     <section class="work-section" id="work">
         <div class="container">
             <div class="section-header">
-                <span class="section-number">05</span>
+                <span class="section-number">06</span>
                 <h2 class="section-title">Work With <span class="highlight-red">Us</span></h2>
                 <div class="section-divider">
                     <span class="divider-line-short"></span>
@@ -253,7 +333,7 @@
                     <a href="#" class="btn-primary" id="mediaKitBtn">
                         <i class="fa-regular fa-file-pdf"></i> Request Media Kit
                     </a>
-                    <a href="#community" class="btn-secondary" id="startPartnershipBtn">
+                    <a href="#" class="btn-secondary" id="openSignupModalBtn">
                         Start Partnership
                     </a>
                 </div>
@@ -270,7 +350,7 @@
     <section class="team-section" id="team">
         <div class="container">
             <div class="section-header">
-                <span class="section-number">06</span>
+                <span class="section-number">07</span>
                 <h2 class="section-title">Meet the <span class="highlight-red">Founders</span></h2>
                 <div class="section-divider">
                     <span class="divider-line-short"></span>
@@ -320,7 +400,7 @@
     <section class="contact-section" id="contact">
         <div class="container">
             <div class="section-header">
-                <span class="section-number">07</span>
+                <span class="section-number">08</span>
                 <h2 class="section-title">Contact <span class="highlight-red">Us</span></h2>
                 <div class="section-divider">
                     <span class="divider-line-short"></span>
@@ -352,18 +432,6 @@
                             <span>100 Projects Media</span>
                         </a>
                     </div>
-                </div>
-                <div class="contact-newsletter">
-                    <h3>Stay Updated</h3>
-                    <p>Subscribe to our newsletter for the latest projects and insights.</p>
-                    <form class="newsletter-form" id="newsletterForm">
-                        <div class="form-group">
-                            <input type="email" placeholder="EMAIL ADDRESS" required />
-                            <button type="submit" class="form-submit">
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
@@ -443,7 +511,7 @@
 
         async function getMemberCount() {
             try {
-                const response = await fetch(`${API_BASE}/members`);
+                const response = await fetch(`${API_BASE}/members?status=accepted`);
                 if (response.ok) {
                     const data = await response.json();
                     return data.count || 0;
@@ -486,96 +554,186 @@
         }
 
         // ==========================================
-        // MEMBERSHIP FORM SUBMISSION
+        // HUB MEMBERS
         // ==========================================
-        document.getElementById('membershipForm').addEventListener('submit', function(e) {
+        let hubMembers = [];
+        let hubPage = 0;
+        const HUB_PAGE_SIZE = 6;
+
+        async function loadHubMembers(reset = true) {
+            if (reset) {
+                hubPage = 0;
+                hubMembers = [];
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/members?status=accepted&page=${hubPage}&limit=${HUB_PAGE_SIZE}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (reset) {
+                        hubMembers = data.members || [];
+                    } else {
+                        hubMembers = [...hubMembers, ...(data.members || [])];
+                    }
+                    renderHubMembers(data.members || []);
+                    
+                    const seeMore = document.getElementById('hubSeeMore');
+                    if (data.members && data.members.length === HUB_PAGE_SIZE) {
+                        seeMore.style.display = 'block';
+                    } else {
+                        seeMore.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.log('Could not load hub members');
+            }
+        }
+
+        function renderHubMembers(members) {
+            const container = document.getElementById('hubGrid');
+            
+            if (hubMembers.length === 0 && members.length === 0) {
+                container.innerHTML = `
+                    <div class="hub-empty">
+                        <p>No members yet. Be the first to join!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Use all loaded members
+            const allMembers = hubMembers;
+            
+            container.innerHTML = allMembers.map(member => `
+                <div class="hub-card">
+                    <div class="hub-image">
+                        <img src="${member.selectedImage || member.image1 || 'Assets/100_Logo.png'}" alt="${member.name}" />
+                    </div>
+                    <div class="hub-info">
+                        <h3 class="hub-name">${member.name}</h3>
+                        <span class="hub-date">${member.timestamp ? new Date(member.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadMoreHubMembers() {
+            hubPage++;
+            loadHubMembers(false);
+        }
+
+        // ==========================================
+        // SIGNUP MODAL
+        // ==========================================
+        const signupModal = document.getElementById('signupModal');
+        const signupModalClose = document.getElementById('signupModalClose');
+        const signupModalOverlay = document.getElementById('signupModalOverlay');
+
+        function openSignupModal() {
+            signupModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSignupModal() {
+            signupModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        signupModalClose.addEventListener('click', closeSignupModal);
+        signupModalOverlay.addEventListener('click', closeSignupModal);
+
+        document.getElementById('openSignupModalBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            openSignupModal();
+        });
+
+        // "Join Us" button also opens modal
+        document.querySelector('.hero-actions .btn-secondary').addEventListener('click', function(e) {
+            e.preventDefault();
+            openSignupModal();
+        });
+
+        // ==========================================
+        // SIGNUP MODAL FORM SUBMISSION
+        // ==========================================
+        document.getElementById('signupModalForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const name = document.getElementById('memberName').value;
-            const email = document.getElementById('memberEmail').value;
-            const role = document.getElementById('memberRole').value;
-            const message = document.getElementById('memberMessage').value;
+            const name = document.getElementById('modalMemberName').value;
+            const email = document.getElementById('modalMemberEmail').value;
+            const role = document.getElementById('modalMemberRole').value;
+            const skills = document.getElementById('modalMemberSkills').value;
+            const website = document.getElementById('modalMemberWebsite').value;
+            const fileInput = document.getElementById('memberPhotos');
+            const files = fileInput.files;
 
             if (!name || !email || !role) {
                 alert('Please fill in all required fields.');
                 return;
             }
 
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
-
-            fetch(`${API_BASE}/signup`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, role, message })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.error || 'Failed to save member data'); });
-                }
-                return response.json();
-            })
-            .then(result => {
-                if (result.success) {
-                    updateCounterDisplay(result.count);
-                    this.style.display = 'none';
-                    document.getElementById('formSuccess').style.display = 'block';
-                    this.reset();
-                } else {
-                    alert(result.error || 'Something went wrong. Please try again.');
-                }
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Become a Member';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('❌ ' + error.message);
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Become a Member';
-            });
-        });
-
-        // ==========================================
-        // PARTNER LOGOS
-        // ==========================================
-        let partnerLogos = [];
-
-        async function loadPartners() {
-            try {
-                const response = await fetch(`${API_BASE}/partners`);
-                if (response.ok) {
-                    const data = await response.json();
-                    partnerLogos = data.logos || [];
-                    renderPartnerLogos();
-                }
-            } catch (error) {
-                console.log('ℹ️ Could not load partner logos');
-            }
-        }
-
-        function renderPartnerLogos() {
-            const track = document.getElementById('partnersTrack');
-            if (!track) return;
-
-            if (partnerLogos.length === 0) {
-                track.innerHTML = `
-                    <div class="partner-logo-item">
-                        <div style="padding:20px 40px; color:#999; font-style:italic; text-align:center; white-space:nowrap;">
-                            Partner logos coming soon
-                        </div>
-                    </div>
-                `;
+            if (files.length === 0) {
+                alert('Please upload at least one photo.');
                 return;
             }
 
-            const logos = [...partnerLogos, ...partnerLogos];
-            track.innerHTML = logos.map(logo => `
-                <div class="partner-logo-item">
-                    <img src="${logo.url}" alt="${logo.name}" title="${logo.name}" onerror="this.style.display='none'" />
-                </div>
-            `).join('');
-        }
+            const submitBtn = document.getElementById('modalSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+
+            try {
+                // Upload images to Cloudinary first
+                const imageUrls = [];
+                for (const file of files) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_preset', 'members');
+
+                    const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/ddks5csyg/image/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (uploadResponse.ok) {
+                        const data = await uploadResponse.json();
+                        imageUrls.push(data.secure_url);
+                    }
+                }
+
+                // Save member data
+                const response = await fetch(`${API_BASE}/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        role,
+                        skills,
+                        website,
+                        image1: imageUrls[0] || '',
+                        image2: imageUrls[1] || '',
+                        image3: imageUrls[2] || '',
+                        status: 'pending'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('signupModalForm').style.display = 'none';
+                    document.getElementById('modalFormSuccess').style.display = 'block';
+                    fileInput.value = '';
+                } else {
+                    alert(result.error || 'Something went wrong. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ ' + error.message);
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Submit Application';
+        });
 
         // ==========================================
         // FETCH AND RENDER FEED
@@ -808,7 +966,6 @@
         document.getElementById('mediaKitBtn').addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Try to get the media kit URL from the dashboard (via Netlify function)
             fetch(`${API_BASE}/media-kit`)
                 .then(response => {
                     if (response.ok) {
@@ -829,27 +986,45 @@
         });
 
         // ==========================================
-        // START PARTNERSHIP BUTTON
+        // PARTNER LOGOS
         // ==========================================
-        document.getElementById('startPartnershipBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            const communitySection = document.getElementById('community');
-            if (communitySection) {
-                communitySection.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
+        let partnerLogos = [];
 
-        // ==========================================
-        // NEWSLETTER FORM
-        // ==========================================
-        document.getElementById('newsletterForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = this.querySelector('input[type="email"]').value;
-            if (email) {
-                alert('Thank you for subscribing! We\'ll keep you updated.');
-                this.querySelector('input').value = '';
+        async function loadPartners() {
+            try {
+                const response = await fetch(`${API_BASE}/partners`);
+                if (response.ok) {
+                    const data = await response.json();
+                    partnerLogos = data.logos || [];
+                    renderPartnerLogos();
+                }
+            } catch (error) {
+                console.log('ℹ️ Could not load partner logos');
             }
-        });
+        }
+
+        function renderPartnerLogos() {
+            const track = document.getElementById('partnersTrack');
+            if (!track) return;
+
+            if (partnerLogos.length === 0) {
+                track.innerHTML = `
+                    <div class="partner-logo-item">
+                        <div style="padding:20px 40px; color:#999; font-style:italic; text-align:center; white-space:nowrap;">
+                            Partner logos coming soon
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const logos = [...partnerLogos, ...partnerLogos];
+            track.innerHTML = logos.map(logo => `
+                <div class="partner-logo-item">
+                    <img src="${logo.url}" alt="${logo.name}" title="${logo.name}" onerror="this.style.display='none'" />
+                </div>
+            `).join('');
+        }
 
         // ==========================================
         // MOBILE NAV
@@ -890,6 +1065,7 @@
             
             await loadArticles();
             await loadPartners();
+            await loadHubMembers(true);
             const memberCount = await getMemberCount();
             updateCounterDisplay(memberCount);
             fetchFeed();
