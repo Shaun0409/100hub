@@ -901,67 +901,36 @@
             });
         }
 
-        // ==========================================
-        // UPDATE MEMBER - DIRECT SHEET.BEST API
-        // ==========================================
+                // ==========================================
+                // UPDATE MEMBER - DIRECT SHEET.BEST API
+                // ==========================================
         async function updateMemberDirect(id, updates) {
             try {
-                // Get the member from Sheet.best
-                const getResponse = await fetch(SHEET_BEST_URL);
-                if (!getResponse.ok) {
-                    throw new Error('Failed to fetch members from Sheet.best');
+                // Use Sheet.best's filtered PATCH: /columnName/*value*
+                // This finds the row where id == the member's id and patches it
+                const url = `${SHEET_BEST_URL}/id/${encodeURIComponent(id)}`;
+
+                const updateResponse = await fetch(url, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)  // e.g. { status: "accepted" }
+                });
+
+                if (!updateResponse.ok) {
+                    const errorText = await updateResponse.text();
+                    console.error('Sheet.best error response:', updateResponse.status, errorText);
+                    throw new Error(`Sheet.best responded with ${updateResponse.status}: ${errorText}`);
                 }
-                const members = await getResponse.json();
-                
-                // Find the member
-                const member = members.find(m => m.id === id || m.id === parseInt(id));
-                if (!member) {
-                    showToast('Member not found in Sheet.best.', 'error');
+
+                const result = await updateResponse.json();
+                console.log('Update result:', result);
+
+                if (!result || (Array.isArray(result) && result.length === 0)) {
+                    // Sheet.best returns [] when no row matched the filter
+                    showToast('Member not found — ID may not match sheet data.', 'error');
                     return false;
                 }
-                
-                // Apply updates
-                Object.keys(updates).forEach(key => {
-                    member[key] = updates[key];
-                });
-                
-                // Update in Sheet.best - try PUT first
-                let updateResponse = await fetch(`${SHEET_BEST_URL}/${member.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(member)
-                });
-                
-                // If PUT fails, try POST
-                if (!updateResponse.ok) {
-                    console.log('PUT failed, trying POST...');
-                    updateResponse = await fetch(`${SHEET_BEST_URL}/${member.id}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(member)
-                    });
-                }
-                
-                // If POST fails, try DELETE + POST (recreate)
-                if (!updateResponse.ok) {
-                    console.log('POST with ID failed, trying to delete and recreate...');
-                    // Delete the old row first
-                    await fetch(`${SHEET_BEST_URL}/${member.id}`, {
-                        method: 'DELETE'
-                    }).catch(() => {});
-                    
-                    // Add as new row
-                    updateResponse = await fetch(SHEET_BEST_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(member)
-                    });
-                }
-                
-                if (!updateResponse.ok) {
-                    throw new Error('Failed to update member in Sheet.best');
-                }
-                
+
                 return true;
             } catch (error) {
                 console.error('Update error:', error);
@@ -969,7 +938,6 @@
                 return false;
             }
         }
-
         // ==========================================
         // SAVE MEMBER EDITS
         // ==========================================
