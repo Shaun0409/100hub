@@ -29,7 +29,7 @@ exports.handler = async function(event, context) {
     }
 
     try {
-        const { name, email, role, skills, website, image1, image2, image3, status } = JSON.parse(event.body);
+        const { name, email, role, skills, website, image1, image2, image3, status, socialPlatform, socialHandle } = JSON.parse(event.body);
 
         if (!name || !email || !role) {
             return {
@@ -63,13 +63,15 @@ exports.handler = async function(event, context) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                id: emailToId(email),          // ← stable, unique, derived from email
+                id: emailToId(email),
                 timestamp: new Date().toISOString(),
                 name: name,
                 email: email,
                 role: role,
                 skills: skills || '',
                 website: website || '',
+                socialPlatform: socialPlatform || '',
+                socialHandle: socialHandle || '',
                 image1: image1 || '',
                 image2: image2 || '',
                 image3: image3 || '',

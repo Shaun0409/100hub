@@ -12,6 +12,204 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    <style>
+        /* ---- HUB CARD ---- */
+        .hub-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .hub-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+        .hub-role-tag {
+            display: inline-block;
+            font-size: 11px;
+            color: var(--red);
+            font-weight: 500;
+            margin-top: 2px;
+            opacity: 0.85;
+        }
+
+        /* ---- MEMBER PROFILE MODAL ---- */
+        .member-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 4000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s ease;
+        }
+        .member-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .member-modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(8px);
+        }
+        .member-modal-content {
+            position: relative;
+            background: var(--white);
+            border-radius: 16px;
+            width: 92%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+            transform: translateY(20px) scale(0.97);
+            transition: transform 0.35s ease;
+            padding: 0;
+        }
+        .member-modal.active .member-modal-content {
+            transform: translateY(0) scale(1);
+        }
+        .member-modal-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 10;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .member-modal-close:hover {
+            background: var(--red);
+            color: white;
+            transform: rotate(90deg);
+        }
+        .member-modal-photo {
+            width: 100%;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            border-radius: 16px 16px 0 0;
+        }
+        .member-modal-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .member-modal-details {
+            padding: 24px 28px 28px;
+        }
+        .member-modal-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 6px;
+            line-height: 1.2;
+        }
+        .member-modal-role {
+            display: inline-block;
+            background: rgba(227,30,36,0.08);
+            color: var(--red);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 3px 12px;
+            border-radius: 100px;
+            margin-bottom: 6px;
+        }
+        .member-modal-date {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            margin-top: 4px;
+        }
+        .member-modal-skills {
+            margin-bottom: 16px;
+        }
+        .member-modal-label {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .member-modal-skills p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+        .member-modal-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-medium);
+        }
+        .member-social-link,
+        .member-website-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 10px 16px;
+            border: 1px solid var(--gray-medium);
+            border-radius: 40px;
+            transition: all 0.2s ease;
+            width: fit-content;
+        }
+        .member-social-link:hover,
+        .member-website-link:hover {
+            border-color: var(--red);
+            color: var(--red);
+            background: rgba(227,30,36,0.04);
+        }
+        .member-social-link i,
+        .member-website-link i {
+            font-size: 16px;
+            width: 18px;
+            text-align: center;
+        }
+
+        /* ---- SOCIAL SELECT STYLING ---- */
+        #modalSocialPlatform {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 28px;
+            cursor: pointer;
+        }
+        #modalSocialPlatform:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+        #modalSocialHandle:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+
+        @media (max-width: 480px) {
+            .member-modal-content { width: 96%; }
+            .member-modal-details { padding: 18px 20px 24px; }
+            .member-modal-name { font-size: 22px; }
+        }
+    </style>
 </head>
 <body>
 
@@ -72,10 +270,7 @@
                 </div>
             </div>
         </div>
-        <div class="hero-scroll">
-            <span>Scroll</span>
-            <div class="scroll-line"></div>
-        </div>
+
     </section>
 
     <!-- ==================== ABOUT ==================== -->
@@ -252,6 +447,23 @@
                 <div class="form-group">
                     <input type="url" id="modalMemberWebsite" placeholder="Website or Portfolio Link (optional)" />
                 </div>
+                <div class="form-group social-group">
+                    <label style="font-size:12px; color:var(--text-muted); margin-bottom:6px; display:block;">Social Media (optional)</label>
+                    <div style="display:flex; gap:8px;">
+                        <select id="modalSocialPlatform" style="padding:10px 12px; border:1px solid var(--gray-medium); border-radius:var(--radius-sm); font-size:14px; color:var(--text-primary); background:var(--white); min-width:140px; flex-shrink:0;">
+                            <option value="">Platform</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="tiktok">TikTok</option>
+                            <option value="twitter">Twitter/X</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="behance">Behance</option>
+                            <option value="pinterest">Pinterest</option>
+                        </select>
+                        <input type="text" id="modalSocialHandle" placeholder="@yourhandle" style="flex:1;" />
+                    </div>
+                </div>
                 <button type="submit" class="btn-primary full-width" id="modalSubmitBtn">
                     <i class="fa-regular fa-paper-plane"></i> Submit Application
                 </button>
@@ -260,6 +472,15 @@
                     <p>Thank you for joining! You will receive an email to let you know that you have been accepted as a member.</p>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- ==================== MEMBER PROFILE MODAL ==================== -->
+    <div class="member-modal" id="memberModal">
+        <div class="member-modal-overlay" id="memberModalOverlay"></div>
+        <div class="member-modal-content">
+            <button class="member-modal-close" id="memberModalClose"><i class="fa-solid fa-xmark"></i></button>
+            <div id="memberModalBody"></div>
         </div>
     </div>
 
@@ -561,71 +782,163 @@
         // ==========================================
         // HUB MEMBERS
         // ==========================================
-        let hubMembers = [];
-        let hubPage = 0;
-        const HUB_PAGE_SIZE = 6;
+        let allHubMembers = [];
+        let hubShowingAll = false;
+        const HUB_INITIAL = 6;
+
+        const SOCIAL_META = {
+            instagram: { icon: 'fa-brands fa-instagram', label: 'Instagram', url: (h) => `https://instagram.com/${h}` },
+            tiktok:    { icon: 'fa-brands fa-tiktok',    label: 'TikTok',    url: (h) => `https://tiktok.com/@${h}` },
+            twitter:   { icon: 'fa-brands fa-x-twitter', label: 'Twitter/X', url: (h) => `https://x.com/${h}` },
+            linkedin:  { icon: 'fa-brands fa-linkedin-in',label: 'LinkedIn', url: (h) => `https://linkedin.com/in/${h}` },
+            youtube:   { icon: 'fa-brands fa-youtube',   label: 'YouTube',   url: (h) => `https://youtube.com/@${h}` },
+            facebook:  { icon: 'fa-brands fa-facebook-f',label: 'Facebook',  url: (h) => `https://facebook.com/${h}` },
+            behance:   { icon: 'fa-brands fa-behance',   label: 'Behance',   url: (h) => `https://behance.net/${h}` },
+            pinterest: { icon: 'fa-brands fa-pinterest-p',label:'Pinterest', url: (h) => `https://pinterest.com/${h}` },
+        };
 
         async function loadHubMembers(reset = true) {
-            if (reset) {
-                hubPage = 0;
-                hubMembers = [];
-            }
-            
             try {
-                const response = await fetch(`${API_BASE}/members?status=accepted&page=${hubPage}&limit=${HUB_PAGE_SIZE}`);
+                const response = await fetch(`${API_BASE}/members?status=accepted&limit=200`);
                 if (response.ok) {
                     const data = await response.json();
-                    if (reset) {
-                        hubMembers = data.members || [];
-                    } else {
-                        hubMembers = [...hubMembers, ...(data.members || [])];
-                    }
-                    renderHubMembers(data.members || []);
-                    
-                    const seeMore = document.getElementById('hubSeeMore');
-                    if (data.members && data.members.length === HUB_PAGE_SIZE) {
-                        seeMore.style.display = 'block';
-                    } else {
-                        seeMore.style.display = 'none';
-                    }
+                    allHubMembers = data.members || [];
+                    renderHubGrid();
                 }
             } catch (error) {
                 console.log('Could not load hub members');
             }
         }
 
-        function renderHubMembers(members) {
+        function renderHubGrid() {
             const container = document.getElementById('hubGrid');
-            
-            if (hubMembers.length === 0 && members.length === 0) {
-                container.innerHTML = `
-                    <div class="hub-empty">
-                        <p>No members yet. Be the first to join!</p>
-                    </div>
-                `;
+            const seeMoreWrap = document.getElementById('hubSeeMore');
+
+            if (allHubMembers.length === 0) {
+                container.innerHTML = `<div class="hub-empty"><p>No members yet. Be the first to join!</p></div>`;
+                seeMoreWrap.style.display = 'none';
                 return;
             }
 
-            // Use all loaded members
-            const allMembers = hubMembers;
-            
-            container.innerHTML = allMembers.map(member => `
-                <div class="hub-card">
-                    <div class="hub-image">
-                        <img src="${member.selectedImage || member.image1 || 'Assets/100_Logo.png'}" alt="${member.name}" />
+            const toShow = hubShowingAll ? allHubMembers : allHubMembers.slice(0, HUB_INITIAL);
+
+            container.innerHTML = toShow.map(member => {
+                const img = member.selectedImage || member.image1 || 'Assets/100_Logo.png';
+                return `
+                    <div class="hub-card" onclick="openMemberModal('${member.email}')" style="cursor:pointer;">
+                        <div class="hub-image">
+                            <img src="${img}" alt="${member.name}" />
+                        </div>
+                        <div class="hub-info">
+                            <h3 class="hub-name">${member.name}</h3>
+                            <span class="hub-role-tag">${member.role || ''}</span>
+                        </div>
                     </div>
-                    <div class="hub-info">
-                        <h3 class="hub-name">${member.name}</h3>
-                        <span class="hub-date">${member.timestamp ? new Date(member.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</span>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+
+            // See More / See Less button
+            if (allHubMembers.length > HUB_INITIAL) {
+                seeMoreWrap.style.display = 'block';
+                const btn = seeMoreWrap.querySelector('button');
+                if (btn) {
+                    btn.innerHTML = hubShowingAll
+                        ? 'See Less <i class="fa-solid fa-arrow-up"></i>'
+                        : 'See More <i class="fa-solid fa-arrow-right"></i>';
+                }
+            } else {
+                seeMoreWrap.style.display = 'none';
+            }
         }
 
         function loadMoreHubMembers() {
-            hubPage++;
-            loadHubMembers(false);
+            hubShowingAll = !hubShowingAll;
+            renderHubGrid();
+            if (!hubShowingAll) {
+                document.getElementById('hub').scrollIntoView({ behavior: 'smooth' });
+            }
         }
+
+        // ==========================================
+        // MEMBER PROFILE MODAL
+        // ==========================================
+        function openMemberModal(email) {
+            const member = allHubMembers.find(m => m.email === email);
+            if (!member) return;
+
+            const img = member.selectedImage || member.image1 || 'Assets/100_Logo.png';
+            const joinDate = member.timestamp
+                ? new Date(member.timestamp).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                : '';
+
+            // Social link
+            let socialHtml = '';
+            if (member.socialPlatform && member.socialHandle) {
+                const meta = SOCIAL_META[member.socialPlatform];
+                if (meta) {
+                    const url = meta.url(member.socialHandle);
+                    socialHtml = `
+                        <a href="${url}" target="_blank" rel="noopener" class="member-social-link">
+                            <i class="${meta.icon}"></i>
+                            <span>@${member.socialHandle}</span>
+                        </a>
+                    `;
+                }
+            }
+
+            // Website
+            let websiteHtml = '';
+            if (member.website) {
+                const display = member.website.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                websiteHtml = `
+                    <a href="${member.website}" target="_blank" rel="noopener" class="member-website-link">
+                        <i class="fa-regular fa-globe"></i>
+                        <span>${display}</span>
+                    </a>
+                `;
+            }
+
+            // Skills
+            let skillsHtml = '';
+            if (member.skills) {
+                skillsHtml = `
+                    <div class="member-modal-skills">
+                        <span class="member-modal-label">Skills</span>
+                        <p>${member.skills}</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('memberModalBody').innerHTML = `
+                <div class="member-modal-photo">
+                    <img src="${img}" alt="${member.name}" />
+                </div>
+                <div class="member-modal-details">
+                    <h2 class="member-modal-name">${member.name}</h2>
+                    <span class="member-modal-role">${member.role || ''}</span>
+                    ${joinDate ? `<span class="member-modal-date">Joined ${joinDate}</span>` : ''}
+                    ${skillsHtml}
+                    <div class="member-modal-links">
+                        ${socialHtml}
+                        ${websiteHtml}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('memberModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMemberModal() {
+            document.getElementById('memberModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('memberModalClose').addEventListener('click', closeMemberModal);
+        document.getElementById('memberModalOverlay').addEventListener('click', closeMemberModal);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMemberModal();
+        });
 
                 // ==========================================
         // IMPACT NUMBERS
@@ -694,6 +1007,8 @@
             const role = document.getElementById('modalMemberRole').value;
             const skills = document.getElementById('modalMemberSkills').value;
             const website = document.getElementById('modalMemberWebsite').value;
+            const socialPlatform = document.getElementById('modalSocialPlatform').value;
+            const socialHandle = document.getElementById('modalSocialHandle').value.trim().replace(/^@/, '');
             const fileInput = document.getElementById('memberPhotos');
             const files = fileInput.files;
 
@@ -740,6 +1055,8 @@
                         role,
                         skills,
                         website,
+                        socialPlatform: socialPlatform || '',
+                        socialHandle: socialHandle || '',
                         image1: imageUrls[0] || '',
                         image2: imageUrls[1] || '',
                         image3: imageUrls[2] || '',

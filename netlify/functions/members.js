@@ -101,7 +101,9 @@ exports.handler = async function(event, context) {
                 image2: m.image2 || '',
                 image3: m.image3 || '',
                 status: m.status || 'pending',
-                selectedImage: m.selectedImage || ''
+                selectedImage: m.selectedImage || '',
+                socialPlatform: m.socialPlatform || '',
+                socialHandle: m.socialHandle || ''
             });
         });
 
