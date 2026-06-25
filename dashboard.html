@@ -902,6 +902,9 @@
             });
         }
 
+      // ==========================================
+        // SAVE MEMBER EDITS
+        // ==========================================
         async function saveMemberEdits() {
             const data = {
                 id: currentMemberId,
@@ -923,13 +926,17 @@
                     closeEditModal();
                     renderMembers();
                 } else {
-                    showToast('Failed to update.', 'error');
+                    showToast('Failed to update: ' + (result.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
-                showToast('Error updating.', 'error');
+                console.error('Save error:', error);
+                showToast('Error updating member.', 'error');
             }
         }
 
+        // ==========================================
+        // UPDATE MEMBER STATUS (Accept/Decline)
+        // ==========================================
         async function updateMemberStatus(status) {
             const data = {
                 id: currentMemberId,
@@ -949,10 +956,11 @@
                     closeEditModal();
                     renderMembers();
                 } else {
-                    showToast('Failed to update.', 'error');
+                    showToast('Failed to update: ' + (result.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
-                showToast('Error updating.', 'error');
+                console.error('Status update error:', error);
+                showToast('Error updating member status.', 'error');
             }
         }
 

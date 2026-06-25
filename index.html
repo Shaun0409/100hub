@@ -518,7 +518,7 @@
                 const response = await fetch(`${API_BASE}/members?status=all`);
                 if (response.ok) {
                     const data = await response.json();
-                    // Return the 'count' which is the number of accepted members
+                    // Use the 'count' field which is the number of accepted members
                     return data.count || 0;
                 }
                 return 0;
