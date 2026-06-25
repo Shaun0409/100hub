@@ -2,7 +2,7 @@
 // Fetches members from Google Sheets via Sheet.best
 
 // ⚠️ REPLACE WITH YOUR SHEET.BEST URL
-const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/YOUR_SHEET_ID/tabs/Members';
+const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Members';
 
 const DEFAULT_OWNERS = [
     {
