@@ -747,6 +747,7 @@
 
     <script>
         const API_BASE = '/.netlify/functions';
+        const SHEET_BEST_URL = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Members';
         let currentMemberId = null;
         let currentFilter = 'all';
 
@@ -783,7 +784,6 @@
         function filterMembers(status) {
             currentFilter = status;
             renderMembers(allMembers);
-            // Update button styles
             document.querySelectorAll('#filterAll, #filterPending, #filterAccepted, #filterDeclined').forEach(btn => {
                 btn.style.background = 'transparent';
                 btn.style.color = '';
@@ -902,35 +902,76 @@
             });
         }
 
-      // ==========================================
+        // ==========================================
+        // UPDATE MEMBER - DIRECT SHEET.BEST API
+        // ==========================================
+        async function updateMember(id, updates) {
+            try {
+                // First, get the member from Sheet.best
+                const getResponse = await fetch(SHEET_BEST_URL);
+                if (!getResponse.ok) {
+                    throw new Error('Failed to fetch members from Sheet.best');
+                }
+                const members = await getResponse.json();
+                
+                // Find the member
+                const member = members.find(m => m.id === id || m.id === parseInt(id));
+                if (!member) {
+                    showToast('Member not found in Sheet.best.', 'error');
+                    return false;
+                }
+                
+                // Apply updates
+                Object.keys(updates).forEach(key => {
+                    member[key] = updates[key];
+                });
+                
+                // Update in Sheet.best - try PUT first
+                let updateResponse = await fetch(`${SHEET_BEST_URL}/${member.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(member)
+                });
+                
+                // If PUT fails, try POST
+                if (!updateResponse.ok) {
+                    updateResponse = await fetch(`${SHEET_BEST_URL}/${member.id}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(member)
+                    });
+                }
+                
+                if (!updateResponse.ok) {
+                    throw new Error('Failed to update member in Sheet.best');
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Update error:', error);
+                showToast('Error: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        // ==========================================
         // SAVE MEMBER EDITS
         // ==========================================
         async function saveMemberEdits() {
-            const data = {
-                id: currentMemberId,
+            const updates = {
                 name: document.getElementById('editName').value,
                 role: document.getElementById('editRole').value,
                 skills: document.getElementById('editSkills').value,
                 selectedImage: selectedImage
             };
-
-            try {
-                const response = await fetch(`${API_BASE}/update-member`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                if (result.success) {
-                    showToast('Member updated!', 'success');
-                    closeEditModal();
-                    renderMembers();
-                } else {
-                    showToast('Failed to update: ' + (result.error || 'Unknown error'), 'error');
-                }
-            } catch (error) {
-                console.error('Save error:', error);
-                showToast('Error updating member.', 'error');
+            
+            const success = await updateMember(currentMemberId, updates);
+            if (success) {
+                showToast('Member updated!', 'success');
+                closeEditModal();
+                renderMembers();
+            } else {
+                showToast('Failed to update member. Please try again.', 'error');
             }
         }
 
@@ -938,29 +979,18 @@
         // UPDATE MEMBER STATUS (Accept/Decline)
         // ==========================================
         async function updateMemberStatus(status) {
-            const data = {
-                id: currentMemberId,
+            const updates = {
                 status: status,
                 selectedImage: selectedImage
             };
-
-            try {
-                const response = await fetch(`${API_BASE}/update-member`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                if (result.success) {
-                    showToast(`Member ${status}!`, 'success');
-                    closeEditModal();
-                    renderMembers();
-                } else {
-                    showToast('Failed to update: ' + (result.error || 'Unknown error'), 'error');
-                }
-            } catch (error) {
-                console.error('Status update error:', error);
-                showToast('Error updating member status.', 'error');
+            
+            const success = await updateMember(currentMemberId, updates);
+            if (success) {
+                showToast(`Member ${status}!`, 'success');
+                closeEditModal();
+                renderMembers();
+            } else {
+                showToast(`Failed to ${status} member. Please try again.`, 'error');
             }
         }
 
