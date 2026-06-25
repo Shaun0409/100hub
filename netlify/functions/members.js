@@ -1,7 +1,7 @@
 // netlify/functions/members.js
 // Fetches members from Google Sheets via Sheet.best
 
-// ⚠️ REPLACE THIS WITH YOUR ACTUAL SHEET.BEST URL
+// ⚠️ REPLACE WITH YOUR SHEET.BEST URL
 const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Members';
 
 const DEFAULT_OWNERS = [
@@ -98,25 +98,32 @@ exports.handler = async function(event, context) {
         });
 
         // Filter by status if specified
+        let filteredMembers = allMembers;
         if (statusFilter !== 'all') {
-            allMembers = allMembers.filter(m => m.status === statusFilter);
+            filteredMembers = allMembers.filter(m => m.status === statusFilter);
         }
 
         // Sort by timestamp (newest first)
-        allMembers.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        filteredMembers.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
         // Paginate
         const start = page * limit;
         const end = start + limit;
-        const paginatedMembers = allMembers.slice(start, end);
+        const paginatedMembers = filteredMembers.slice(start, end);
+
+        // Count accepted members for the "Road to 100" counter
+        const acceptedCount = allMembers.filter(m => m.status === 'accepted').length;
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
                 members: paginatedMembers,
-                count: allMembers.length,
-                total: allMembers.length
+                count: acceptedCount,  // 👈 This is what the website uses
+                total: allMembers.length,
+                accepted: acceptedCount,
+                pending: allMembers.filter(m => m.status === 'pending').length,
+                declined: allMembers.filter(m => m.status === 'declined').length
             })
         };
     } catch (error) {
@@ -127,7 +134,8 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({
                 members: DEFAULT_OWNERS,
                 count: DEFAULT_OWNERS.length,
-                total: DEFAULT_OWNERS.length
+                total: DEFAULT_OWNERS.length,
+                accepted: DEFAULT_OWNERS.length
             })
         };
     }
