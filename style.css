@@ -196,7 +196,7 @@ body {
     display: block;
     width: 24px;
     height: 2px;
-    background-color: #FFFFFF;
+    background-color: #ff0000;
     position: relative;
     transition: var(--transition-fast);
 }
