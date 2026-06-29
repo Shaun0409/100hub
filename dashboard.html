@@ -467,6 +467,19 @@
         }
         .back-link:hover { color: var(--text-primary); }
 
+        /* ---- LOADING SHIMMER ---- */
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
         @media (max-width: 768px) {
             .dashboard-header {
                 flex-direction: column;
@@ -751,6 +764,42 @@
         let currentFilter = 'all';
 
         // ==========================================
+        // CACHE SYSTEM
+        // ==========================================
+        const CACHE = {
+            members: null,
+            timestamp: null,
+            duration: 30000, // 30 seconds cache
+            
+            get(key) {
+                if (!this[key] || !this.timestamp) return null;
+                if (Date.now() - this.timestamp > this.duration) return null;
+                return this[key];
+            },
+            
+            set(key, data) {
+                this[key] = data;
+                this.timestamp = Date.now();
+            },
+            
+            clear() {
+                this.members = null;
+                this.timestamp = null;
+            }
+        };
+
+        // ==========================================
+        // OPTIMIZED IMAGE LOADING
+        // ==========================================
+        function getOptimizedImage(url, width = 400, height = 400) {
+            if (!url) return 'Assets/100_Logo.png';
+            if (url.includes('cloudinary.com')) {
+                return url.replace('/upload/', `/upload/c_fill,w_${width},h_${height},q_auto,f_auto/`);
+            }
+            return url;
+        }
+
+        // ==========================================
         // TABS
         // ==========================================
         document.querySelectorAll('.dashboard-tabs button').forEach(btn => {
@@ -771,9 +820,19 @@
         let allMembers = [];
 
         async function fetchMembers() {
+            // Check cache first
+            const cached = CACHE.get('members');
+            if (cached) {
+                console.log('📦 Using cached members data');
+                return cached;
+            }
+            
             try {
                 const response = await fetch(`${API_BASE}/members`);
-                return await response.json();
+                const data = await response.json();
+                // Store in cache
+                CACHE.set('members', data);
+                return data;
             } catch (error) {
                 console.error('Fetch members error:', error);
                 return { members: [], count: 0 };
@@ -782,7 +841,7 @@
 
         function filterMembers(status) {
             currentFilter = status;
-            renderMembers(allMembers);
+            renderMembers();
             document.querySelectorAll('#filterAll, #filterPending, #filterAccepted, #filterDeclined').forEach(btn => {
                 btn.style.background = 'transparent';
                 btn.style.color = '';
@@ -826,23 +885,30 @@
                 return;
             }
             
-            tbody.innerHTML = filtered.map((member, index) => `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td><strong style="color:var(--text-primary);">${member.name}</strong></td>
-                    <td><a href="mailto:${member.email}" style="color:var(--text-secondary); text-decoration:none;">${member.email}</a></td>
-                    <td><span class="member-role">${member.role}</span></td>
-                    <td><span class="status-badge ${member.status || 'pending'}">${member.status || 'pending'}</span></td>
-                    <td style="text-align:center;">
-                        <button class="btn-outline btn-sm" onclick="openEditModal('${member.id}')" title="Edit">
-                            <i class="fa-regular fa-pen-to-square"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = filtered.map((member, index) => {
+                const img = getOptimizedImage(member.image1, 50, 50);
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><strong style="color:var(--text-primary);">${member.name}</strong></td>
+                        <td><a href="mailto:${member.email}" style="color:var(--text-secondary); text-decoration:none;">${member.email}</a></td>
+                        <td><span class="member-role">${member.role}</span></td>
+                        <td><span class="status-badge ${member.status || 'pending'}">${member.status || 'pending'}</span></td>
+                        <td style="text-align:center;">
+                            <button class="btn-outline btn-sm" onclick="openEditModal('${member.id}')" title="Edit">
+                                <i class="fa-regular fa-pen-to-square"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        function refreshMembers() { renderMembers(); showToast('Refreshed!', 'success'); }
+        function refreshMembers() { 
+            CACHE.clear();
+            renderMembers(); 
+            showToast('Refreshed!', 'success'); 
+        }
 
         // ==========================================
         // EDIT MODAL
@@ -863,7 +929,7 @@
             document.getElementById('editRole').value = member.role || '';
             document.getElementById('editSkills').value = member.skills || '';
 
-            // Render image selection
+            // Render image selection with optimized images
             const grid = document.getElementById('imageSelectGrid');
             const images = [member.image1, member.image2, member.image3].filter(img => img);
             
@@ -872,7 +938,7 @@
             } else {
                 grid.innerHTML = images.map((img, index) => `
                     <div class="image-select-option ${selectedImage === img ? 'selected' : ''}" onclick="selectImage('${img}')">
-                        <img src="${img}" alt="Photo ${index + 1}" />
+                        <img src="${getOptimizedImage(img, 200, 200)}" alt="Photo ${index + 1}" loading="lazy" />
                         <div class="check"><i class="fa-solid fa-check"></i></div>
                     </div>
                 `).join('');
@@ -895,7 +961,7 @@
             selectedImage = img;
             document.querySelectorAll('.image-select-option').forEach(el => {
                 el.classList.remove('selected');
-                if (el.querySelector('img')?.src === img) {
+                if (el.querySelector('img')?.src.includes(img.split('/').pop())) {
                     el.classList.add('selected');
                 }
             });
@@ -909,7 +975,6 @@
                 const response = await fetch(`${API_BASE}/update-member`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // ✅ Identify member by email — always present, always unique
                     body: JSON.stringify({ email, ...updates })
                 });
 
@@ -928,6 +993,7 @@
                 return false;
             }
         }
+
         // ==========================================
         // SAVE MEMBER EDITS
         // ==========================================
@@ -939,11 +1005,11 @@
                 selectedImage: selectedImage
             };
 
-            // ✅ Use email (stored on editingMemberData) as the stable identifier
             const success = await updateMemberDirect(editingMemberData.email, updates);
             if (success) {
                 showToast('Member updated!', 'success');
                 closeEditModal();
+                CACHE.clear();
                 renderMembers();
             } else {
                 showToast('Failed to update member. Please try again.', 'error');
@@ -959,11 +1025,11 @@
                 selectedImage: selectedImage
             };
 
-            // ✅ Use email as the stable identifier
             const success = await updateMemberDirect(editingMemberData.email, updates);
             if (success) {
                 showToast(`Member ${status}!`, 'success');
                 closeEditModal();
+                CACHE.clear();
                 renderMembers();
             } else {
                 showToast(`Failed to ${status} member. Please try again.`, 'error');
@@ -978,7 +1044,7 @@
                 const data = localStorage.getItem('impactNumbers');
                 if (data) {
                     const parsed = JSON.parse(data);
-                    document.getElementById('impactMagazine').textContent = parsed.magazine + (parsed.magazine > 9 ? '' : '');
+                    document.getElementById('impactMagazine').textContent = parsed.magazine || 8;
                     document.getElementById('impactFeatures').textContent = parsed.features + (parsed.features > 9 ? '' : '+');
                     document.getElementById('impactCollaborations').textContent = parsed.collaborations + (parsed.collaborations > 9 ? '' : '+');
                     document.getElementById('impactReach').textContent = parsed.reach >= 1000000 ? (parsed.reach / 1000000).toFixed(1) + 'M+' : parsed.reach + '+';
@@ -1027,7 +1093,7 @@
                 document.getElementById('totalPartners').textContent = data.logos.length;
                 grid.innerHTML = data.logos.map(logo => `
                     <div class="partner-card">
-                        <img src="${logo.url}" alt="${logo.name}" onerror="this.style.display='none'" />
+                        <img src="${logo.url}" alt="${logo.name}" loading="lazy" onerror="this.style.display='none'" />
                         <div class="partner-name">${logo.name}</div>
                     </div>
                 `).join('');
@@ -1197,7 +1263,6 @@
         console.log('ℹ️ Using direct Sheet.best API for member updates.');
         console.log('🔗 Sheet.best URL:', SHEET_BEST_URL);
     </script>
-
 
 </body>
 </html>

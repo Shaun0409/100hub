@@ -3,7 +3,11 @@
 
 const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Members';
 
-// Must match the same function in signup.js
+// Function-level cache
+let cachedData = null;
+let cacheTime = null;
+const CACHE_TTL = 60 * 1000; // 1 minute
+
 function emailToId(email) {
     return 'member_' + email.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
@@ -28,6 +32,16 @@ exports.handler = async function(event, context) {
     }
 
     try {
+        // Check function-level cache
+        if (cachedData && cacheTime && (Date.now() - cacheTime < CACHE_TTL)) {
+            console.log('📦 Using cached response');
+            return {
+                statusCode: 200,
+                headers: { ...headers, 'Cache-Control': 'public, max-age=60' },
+                body: JSON.stringify(cachedData)
+            };
+        }
+
         const response = await fetch(SHEET_BEST_API);
         let sheetMembers = [];
 
@@ -38,20 +52,22 @@ exports.handler = async function(event, context) {
             }
         }
 
-        // Get query parameters
         const params = event.queryStringParameters || {};
         const statusFilter = params.status || 'all';
         const page = parseInt(params.page) || 0;
         const limit = parseInt(params.limit) || 100;
 
-        // Build member list purely from sheet data
+        // Use Set for O(1) lookups
         const seenEmails = new Set();
         let allMembers = [];
 
-        sheetMembers.forEach(m => {
-            if (!m.email) return;
-            if (seenEmails.has(m.email.toLowerCase())) return;
-            seenEmails.add(m.email.toLowerCase());
+        // Optimized loop
+        for (let i = 0; i < sheetMembers.length; i++) {
+            const m = sheetMembers[i];
+            if (!m.email) continue;
+            const emailKey = m.email.toLowerCase();
+            if (seenEmails.has(emailKey)) continue;
+            seenEmails.add(emailKey);
 
             allMembers.push({
                 id: m.id || emailToId(m.email),
@@ -69,12 +85,17 @@ exports.handler = async function(event, context) {
                 socialPlatform: m.socialPlatform || '',
                 socialHandle: m.socialHandle || ''
             });
-        });
+        }
 
-        // Filter by status
+        // Filter by status (optimized)
         let filteredMembers = allMembers;
         if (statusFilter !== 'all') {
-            filteredMembers = allMembers.filter(m => m.status === statusFilter);
+            filteredMembers = [];
+            for (let i = 0; i < allMembers.length; i++) {
+                if (allMembers[i].status === statusFilter) {
+                    filteredMembers.push(allMembers[i]);
+                }
+            }
         }
 
         // Sort by timestamp (newest first)
@@ -84,19 +105,33 @@ exports.handler = async function(event, context) {
         const start = page * limit;
         const paginatedMembers = filteredMembers.slice(start, start + limit);
 
-        const acceptedCount = allMembers.filter(m => m.status === 'accepted').length;
+        // Count accepted members
+        let acceptedCount = 0;
+        let pendingCount = 0;
+        let declinedCount = 0;
+        for (let i = 0; i < allMembers.length; i++) {
+            if (allMembers[i].status === 'accepted') acceptedCount++;
+            else if (allMembers[i].status === 'pending') pendingCount++;
+            else if (allMembers[i].status === 'declined') declinedCount++;
+        }
+
+        const result = {
+            members: paginatedMembers,
+            count: acceptedCount,
+            total: allMembers.length,
+            accepted: acceptedCount,
+            pending: pendingCount,
+            declined: declinedCount
+        };
+
+        // Cache the result
+        cachedData = result;
+        cacheTime = Date.now();
 
         return {
             statusCode: 200,
-            headers,
-            body: JSON.stringify({
-                members: paginatedMembers,
-                count: acceptedCount,
-                total: allMembers.length,
-                accepted: acceptedCount,
-                pending: allMembers.filter(m => m.status === 'pending').length,
-                declined: allMembers.filter(m => m.status === 'declined').length
-            })
+            headers: { ...headers, 'Cache-Control': 'public, max-age=60' },
+            body: JSON.stringify(result)
         };
     } catch (error) {
         console.error('Members error:', error);
@@ -114,5 +149,3 @@ exports.handler = async function(event, context) {
         };
     }
 };
-
-

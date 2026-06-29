@@ -1097,65 +1097,6 @@ section {
 }
 
 /* ==========================================
-   SOCIAL MEDIA INPUT - VISIBILITY FIX
-   ========================================== */
-.social-group .social-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    width: 100%;
-}
-
-.social-group .social-row select {
-    flex: 0 0 140px;
-    min-width: 120px;
-    padding: 10px 12px;
-    border: 1px solid var(--gray-medium);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    color: var(--text-primary);
-    background: var(--white);
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 28px;
-}
-
-.social-group .social-row input {
-    flex: 1;
-    min-width: 150px;
-    padding: 10px 12px;
-    border: 1px solid var(--gray-medium);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    color: var(--text-primary);
-    background: var(--white);
-}
-
-.social-group .social-row select:focus,
-.social-group .social-row input:focus {
-    outline: none;
-    border-color: var(--red);
-}
-
-/* Mobile responsive for social row */
-@media (max-width: 600px) {
-    .social-group .social-row {
-        flex-direction: column;
-        gap: 6px;
-    }
-    
-    .social-group .social-row select,
-    .social-group .social-row input {
-        width: 100%;
-        flex: none;
-        min-width: unset;
-    }
-}
-
-/* ==========================================
    TEAM
    ========================================== */
 .team-section {
@@ -1506,6 +1447,21 @@ section {
     font-size: 12px;
     color: var(--text-muted);
     letter-spacing: 0.5px;
+}
+
+/* ==========================================
+   LOADING SHIMMER
+   ========================================== */
+.loading-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
 }
 
 /* ==========================================
