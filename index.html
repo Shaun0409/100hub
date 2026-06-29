@@ -204,10 +204,57 @@
             border-color: var(--red);
         }
 
+        /* ---- SOCIAL MEDIA ROW FIX ---- */
+        .social-group .social-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .social-group .social-row select {
+            flex: 0 0 140px;
+            min-width: 120px;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-medium);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--white);
+            cursor: pointer;
+        }
+
+        .social-group .social-row input {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-medium);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--white);
+        }
+
+        .social-group .social-row select:focus,
+        .social-group .social-row input:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+
         @media (max-width: 480px) {
             .member-modal-content { width: 96%; }
             .member-modal-details { padding: 18px 20px 24px; }
             .member-modal-name { font-size: 22px; }
+            .social-group .social-row {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .social-group .social-row select,
+            .social-group .social-row input {
+                width: 100%;
+                flex: none;
+                min-width: unset;
+            }
         }
     </style>
 </head>
@@ -464,11 +511,17 @@
                 <button type="submit" class="btn-primary full-width" id="modalSubmitBtn">
                     <i class="fa-regular fa-paper-plane"></i> Submit Application
                 </button>
-                <!-- Replace the existing modalFormSuccess div with this -->
+                <!-- SUCCESS MESSAGE - UPDATED -->
                 <div id="modalFormSuccess" style="display:none; text-align:center; padding:30px 20px;">
                     <i class="fa-regular fa-circle-check" style="font-size:48px; color:var(--red); display:block; margin-bottom:16px;"></i>
-                    <h3 style="font-family:'Playfair Display',serif; font-size:24px; margin-bottom:8px;">Thank You! 🙌</h3>
-                    <p style="color:var(--text-secondary); font-size:15px; max-width:400px; margin:0 auto;">Thank you for signing up to the 100 HUB. We will review your application and let you know once you have been accepted.</p>
+                    <h3 style="font-family:'Playfair Display',serif; font-size:24px; margin-bottom:8px; color:var(--text-primary);">Thank You for Joining! 🙌</h3>
+                    <p style="color:var(--text-secondary); font-size:15px; max-width:400px; margin:0 auto; line-height:1.6;">
+                        Thank you for signing up to the 100 HUB community.
+                        <br><br>
+                        We will review your profile and get back to you shortly.
+                        <br><br>
+                        You will receive an email notification once your application has been reviewed.
+                    </p>
                 </div>
             </form>
         </div>
@@ -562,7 +615,7 @@
                     </a>
                 </div>
                 <div class="work-contact">
-                    <a href="mailto:100projectsmedia@gmail.com.com" class="work-email">100projectsmedia@gmail.com</a>
+                    <a href="mailto:100projectsmedia@gmail.com" class="work-email">100projectsmedia@gmail.com</a>
                     <span class="work-divider">·</span>
                     <a href="https://www.instagram.com/100projectsmedia" target="_blank" class="work-social">@100projectsmedia</a>
                 </div>
@@ -738,7 +791,6 @@
                 const response = await fetch(`${API_BASE}/members?status=all`);
                 if (response.ok) {
                     const data = await response.json();
-                    // Use the 'count' field which is the number of accepted members
                     return data.count || 0;
                 }
                 return 0;
@@ -752,10 +804,6 @@
             const counter = document.getElementById('memberCount');
             const progress = document.getElementById('progressBar');
             const status = document.getElementById('roadStatus');
-            const form = document.getElementById('signupForm');
-            const fullMsg = document.getElementById('formFull');
-            const successMsg = document.getElementById('formSuccess');
-            const submitBtn = document.getElementById('submitBtn');
 
             if (count === null || count === undefined) {
                 if (counter) counter.textContent = '...';
@@ -767,15 +815,6 @@
             if (counter) counter.textContent = count;
             if (progress) progress.style.width = ((count || 0) / MAX_MEMBERS) * 100 + '%';
             if (status) status.textContent = (count || 0) + ' creators have joined the journey';
-
-            if (count >= MAX_MEMBERS) {
-                if (form) form.style.display = 'none';
-                if (fullMsg) fullMsg.style.display = 'block';
-                if (successMsg) successMsg.style.display = 'none';
-                if (submitBtn) submitBtn.disabled = true;
-            } else {
-                if (fullMsg) fullMsg.style.display = 'none';
-            }
         }
 
         // ==========================================
@@ -836,7 +875,6 @@
                 `;
             }).join('');
 
-            // See More / See Less button
             if (allHubMembers.length > HUB_INITIAL) {
                 seeMoreWrap.style.display = 'block';
                 const btn = seeMoreWrap.querySelector('button');
@@ -870,7 +908,6 @@
                 ? new Date(member.timestamp).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
                 : '';
 
-            // Social link
             let socialHtml = '';
             if (member.socialPlatform && member.socialHandle) {
                 const meta = SOCIAL_META[member.socialPlatform];
@@ -885,7 +922,6 @@
                 }
             }
 
-            // Website
             let websiteHtml = '';
             if (member.website) {
                 const display = member.website.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -897,7 +933,6 @@
                 `;
             }
 
-            // Skills
             let skillsHtml = '';
             if (member.skills) {
                 skillsHtml = `
@@ -939,7 +974,7 @@
             if (e.key === 'Escape') closeMemberModal();
         });
 
-                // ==========================================
+        // ==========================================
         // IMPACT NUMBERS
         // ==========================================
         function loadImpactNumbers() {
@@ -956,13 +991,6 @@
                 // Default values already in HTML
             }
         }
-
-        // Call this in your DOMContentLoaded:
-        document.addEventListener('DOMContentLoaded', async function() {
-            // ... existing code ...
-            loadImpactNumbers(); // Add this line
-            // ... rest of code ...
-        });
 
         // ==========================================
         // SIGNUP MODAL
@@ -989,14 +1017,13 @@
             openSignupModal();
         });
 
-        // "Join Us" button also opens modal
         document.querySelector('.hero-actions .btn-secondary').addEventListener('click', function(e) {
             e.preventDefault();
             openSignupModal();
         });
 
         // ==========================================
-        // SIGNUP MODAL FORM SUBMISSION
+        // SIGNUP MODAL FORM SUBMISSION - FIXED
         // ==========================================
         document.getElementById('signupModalForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1022,17 +1049,19 @@
             }
 
             const submitBtn = document.getElementById('modalSubmitBtn');
+            const form = document.getElementById('signupModalForm');
+            const successDiv = document.getElementById('modalFormSuccess');
+
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
             try {
-                // Upload images to Cloudinary with folder
                 const imageUrls = [];
                 for (const file of files) {
                     const formData = new FormData();
                     formData.append('file', file);
                     formData.append('upload_preset', 'members');
-                    formData.append('folder', '100 TRUSTEES'); // 👈 ADD THIS LINE
+                    formData.append('folder', '100 TRUSTEES');
 
                     const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/dfozevcbl/image/upload`, {
                         method: 'POST',
@@ -1055,7 +1084,6 @@
                     return;
                 }
 
-                // Save member data
                 const response = await fetch(`${API_BASE}/signup`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1077,8 +1105,8 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    document.getElementById('signupModalForm').style.display = 'none';
-                    document.getElementById('modalFormSuccess').style.display = 'block';
+                    form.style.display = 'none';
+                    successDiv.style.display = 'block';
                     fileInput.value = '';
                 } else {
                     alert(result.error || 'Something went wrong. Please try again.');
@@ -1411,6 +1439,7 @@
             const memberCount = await getMemberCount();
             updateCounterDisplay(memberCount);
             fetchFeed();
+            loadImpactNumbers();
             
             console.log('🎯 100 HUB — Website Loaded');
             console.log('📸 Feed ID:', BEHOLD_FEED_ID);
