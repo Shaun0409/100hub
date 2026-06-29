@@ -1104,10 +1104,22 @@
 
                 const result = await response.json();
 
+                // Replace this section in the signup form submission
                 if (result.success) {
-                    form.style.display = 'none';
-                    successDiv.style.display = 'block';
+                    // Hide the form completely
+                    document.getElementById('signupModalForm').style.display = 'none';
+                    // Show the success message
+                    document.getElementById('modalFormSuccess').style.display = 'block';
+                    // Clear file input
                     fileInput.value = '';
+                    // Reset form fields
+                    document.getElementById('modalMemberName').value = '';
+                    document.getElementById('modalMemberEmail').value = '';
+                    document.getElementById('modalMemberRole').value = '';
+                    document.getElementById('modalMemberSkills').value = '';
+                    document.getElementById('modalMemberWebsite').value = '';
+                    document.getElementById('modalSocialPlatform').value = '';
+                    document.getElementById('modalSocialHandle').value = '';
                 } else {
                     alert(result.error || 'Something went wrong. Please try again.');
                 }
