@@ -5,13 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>100 HUB — Broadcasting & Media Production</title>
     <meta name="description" content="100 HUB - Your partner in Multimedia, PR, Events & Management." />
-    
+
+    <!-- DNS/TCP early connections -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+    <link rel="preconnect" href="https://feeds.behold.so" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <!-- Fonts — display=swap prevents invisible text flash -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Font Awesome — non-blocking: loads async, won't delay first paint -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" /></noscript>
+
+    <!-- Site styles -->
     <link rel="stylesheet" href="style.css" />
+
+    <!-- Preload above-the-fold images so they appear instantly -->
+    <link rel="preload" as="image" href="Assets/100_Logo.png">
+    <link rel="preload" as="image" href="Assets/100_Hero.png">
     <style>
         /* ---- HUB CARD ---- */
         .hub-card {
@@ -241,19 +255,6 @@
             border-color: var(--red);
         }
 
-        /* ---- LOADING SHIMMER ---- */
-        .loading-shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: var(--radius-sm);
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
         @media (max-width: 480px) {
             .member-modal-content { width: 96%; }
             .member-modal-details { padding: 18px 20px 24px; }
@@ -481,8 +482,8 @@
         <div class="signup-modal-overlay" id="signupModalOverlay"></div>
         <div class="signup-modal-content">
             <button class="signup-modal-close" id="signupModalClose"><i class="fa-solid fa-xmark"></i></button>
-            <h2 style="font-family:'Playfair Display',serif; font-size:28px; margin-bottom:8px;">Become a Member</h2>
-            <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Join the 100 HUB creative community</p>
+            <h2 style="font-family:'Playfair Display',serif; font-size:28px; margin-bottom:8px;">Join the <span style="color:var(--red);">100 HUB</span></h2>
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Apply to become a member of our creative community</p>
             <form id="signupModalForm">
                 <div class="form-group">
                     <label>Professional Photo (3 images)</label>
@@ -524,18 +525,17 @@
                 <button type="submit" class="btn-primary full-width" id="modalSubmitBtn">
                     <i class="fa-regular fa-paper-plane"></i> Submit Application
                 </button>
-                <!-- SUCCESS MESSAGE -->
-                <div id="modalFormSuccess" style="display:none; text-align:center; padding:30px 20px;">
-                    <i class="fa-regular fa-circle-check" style="font-size:48px; color:var(--red); display:block; margin-bottom:16px;"></i>
-                    <h3 style="font-family:'Playfair Display',serif; font-size:24px; margin-bottom:8px; color:var(--text-primary);">Thank You for Joining! 🙌</h3>
-                    <p style="color:var(--text-secondary); font-size:15px; max-width:400px; margin:0 auto; line-height:1.6;">
-                        Thank you for signing up to the 100 HUB community.
-                        <br><br>
-                        We will review your profile and get back to you shortly.
-                        <br><br>
-                        You will receive an email notification once your application has been reviewed.
-                    </p>
-                </div>
+            </form>
+
+            <!-- SUCCESS MESSAGE — outside the form so hiding the form doesn't hide this -->
+            <div id="modalFormSuccess" style="display:none; text-align:center; padding:30px 20px;">
+                <i class="fa-regular fa-circle-check" style="font-size:48px; color:var(--red); display:block; margin-bottom:16px;"></i>
+                <h3 style="font-family:'Playfair Display',serif; font-size:24px; margin-bottom:8px; color:var(--text-primary);">Thank you for joining!</h3>
+                <p style="color:var(--text-secondary); font-size:15px; line-height:1.7;">
+                    We've received your application and we'll be in touch soon.<br><br>
+                    You'll hear from us once your profile has been reviewed.
+                </p>
+            </div>
             </form>
         </div>
     </div>
@@ -654,7 +654,7 @@
             <div class="team-grid">
                 <div class="team-card">
                     <div class="team-image">
-                        <img src="team/Mpilo.jpeg" alt="Mpilo Nhlapho" />
+                        <img src="team/Mpilo.jpeg" alt="Mpilo Nhlapho" loading="lazy" />
                         <a href="https://www.linkedin.com/in/mpilo-nhlapho-611752251" target="_blank" class="team-linkedin">
                             <i class="fa-brands fa-linkedin-in"></i>
                         </a>
@@ -669,7 +669,7 @@
                 </div>
                 <div class="team-card">
                     <div class="team-image">
-                        <img src="team/Khosi.jpeg" alt="Lesley Khocy" />
+                        <img src="team/Khosi.jpeg" alt="Lesley Khocy" loading="lazy" />
                         <a href="https://www.linkedin.com/in/serutcip-entertainment-288195353" target="_blank" class="team-linkedin">
                             <i class="fa-brands fa-linkedin-in"></i>
                         </a>
@@ -731,7 +731,7 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <img src="Assets/100_Logo.png" alt="100 HUB" class="footer-logo" />
+                <img src="Assets/100_Logo.png" alt="100 HUB" class="footer-logo" loading="lazy" />
                 <div class="footer-divider">
                     <span class="divider-line-short"></span>
                     <span class="divider-dot"></span>
@@ -795,42 +795,6 @@
         const API_BASE = '/.netlify/functions';
 
         // ==========================================
-        // CACHE SYSTEM
-        // ==========================================
-        const CACHE = {
-            members: null,
-            timestamp: null,
-            duration: 30000, // 30 seconds cache
-            
-            get(key) {
-                if (!this[key] || !this.timestamp) return null;
-                if (Date.now() - this.timestamp > this.duration) return null;
-                return this[key];
-            },
-            
-            set(key, data) {
-                this[key] = data;
-                this.timestamp = Date.now();
-            },
-            
-            clear() {
-                this.members = null;
-                this.timestamp = null;
-            }
-        };
-
-        // ==========================================
-        // OPTIMIZED IMAGE LOADING
-        // ==========================================
-        function getOptimizedImage(url, width = 400, height = 400) {
-            if (!url) return 'Assets/100_Logo.png';
-            if (url.includes('cloudinary.com')) {
-                return url.replace('/upload/', `/upload/c_fill,w_${width},h_${height},q_auto,f_auto/`);
-            }
-            return url;
-        }
-
-        // ==========================================
         // MEMBER COUNT (from Google Sheets)
         // ==========================================
         const MAX_MEMBERS = 100;
@@ -867,12 +831,19 @@
         }
 
         // ==========================================
-        // HUB MEMBERS
+        // CLOUDINARY IMAGE OPTIMIZER
+        // Automatically adds quality + format + resize transforms to Cloudinary URLs
+        // ==========================================
+        function optimizeImage(url, width = 800) {
+            if (!url) return url;
+            if (!url.includes('res.cloudinary.com')) return url;
+            // Insert transformation before /upload/
+            return url.replace('/upload/', `/upload/f_auto,q_auto:good,w_${width},c_limit/`);
+        }
         // ==========================================
         let allHubMembers = [];
         let hubShowingAll = false;
         const HUB_INITIAL = 6;
-        const HUB_LOAD_MORE = 6;
 
         const SOCIAL_META = {
             instagram: { icon: 'fa-brands fa-instagram', label: 'Instagram', url: (h) => `https://instagram.com/${h}` },
@@ -887,18 +858,10 @@
 
         async function loadHubMembers(reset = true) {
             try {
-                const cached = CACHE.get('members');
-                if (cached && cached.members) {
-                    allHubMembers = cached.members || [];
-                    renderHubGrid();
-                    return;
-                }
-                
                 const response = await fetch(`${API_BASE}/members?status=accepted&limit=200`);
                 if (response.ok) {
                     const data = await response.json();
                     allHubMembers = data.members || [];
-                    CACHE.set('members', data);
                     renderHubGrid();
                 }
             } catch (error) {
@@ -916,11 +879,10 @@
                 return;
             }
 
-            const visibleCount = hubShowingAll ? allHubMembers.length : Math.min(HUB_INITIAL, allHubMembers.length);
-            const toShow = allHubMembers.slice(0, visibleCount);
+            const toShow = hubShowingAll ? allHubMembers : allHubMembers.slice(0, HUB_INITIAL);
 
             container.innerHTML = toShow.map(member => {
-                const img = getOptimizedImage(member.selectedImage || member.image1);
+                const img = optimizeImage(member.selectedImage || member.image1 || 'Assets/100_Logo.png', 600);
                 return `
                     <div class="hub-card" onclick="openMemberModal('${member.email}')" style="cursor:pointer;">
                         <div class="hub-image">
@@ -934,17 +896,13 @@
                 `;
             }).join('');
 
-            if (allHubMembers.length > visibleCount) {
+            if (allHubMembers.length > HUB_INITIAL) {
                 seeMoreWrap.style.display = 'block';
                 const btn = seeMoreWrap.querySelector('button');
                 if (btn) {
-                    btn.innerHTML = `See More (${allHubMembers.length - visibleCount} left) <i class="fa-solid fa-arrow-right"></i>`;
-                }
-            } else if (allHubMembers.length > HUB_INITIAL && hubShowingAll) {
-                seeMoreWrap.style.display = 'block';
-                const btn = seeMoreWrap.querySelector('button');
-                if (btn) {
-                    btn.innerHTML = 'See Less <i class="fa-solid fa-arrow-up"></i>';
+                    btn.innerHTML = hubShowingAll
+                        ? 'See Less <i class="fa-solid fa-arrow-up"></i>'
+                        : 'See More <i class="fa-solid fa-arrow-right"></i>';
                 }
             } else {
                 seeMoreWrap.style.display = 'none';
@@ -952,53 +910,10 @@
         }
 
         function loadMoreHubMembers() {
+            hubShowingAll = !hubShowingAll;
+            renderHubGrid();
             if (!hubShowingAll) {
-                const currentVisible = document.querySelectorAll('.hub-card').length;
-                const newVisible = Math.min(currentVisible + HUB_LOAD_MORE, allHubMembers.length);
-                
-                if (newVisible >= allHubMembers.length) {
-                    hubShowingAll = true;
-                }
-                
-                const container = document.getElementById('hubGrid');
-                const toShow = allHubMembers.slice(0, newVisible);
-                
-                container.innerHTML = toShow.map(member => {
-                    const img = getOptimizedImage(member.selectedImage || member.image1);
-                    return `
-                        <div class="hub-card" onclick="openMemberModal('${member.email}')" style="cursor:pointer;">
-                            <div class="hub-image">
-                                <img src="${img}" alt="${member.name}" loading="lazy" />
-                            </div>
-                            <div class="hub-info">
-                                <h3 class="hub-name">${member.name}</h3>
-                                <span class="hub-role-tag">${member.role || ''}</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                const seeMoreWrap = document.getElementById('hubSeeMore');
-                if (newVisible >= allHubMembers.length) {
-                    seeMoreWrap.style.display = 'block';
-                    const btn = seeMoreWrap.querySelector('button');
-                    if (btn) {
-                        btn.innerHTML = 'See Less <i class="fa-solid fa-arrow-up"></i>';
-                    }
-                    hubShowingAll = true;
-                } else {
-                    const btn = seeMoreWrap.querySelector('button');
-                    if (btn) {
-                        btn.innerHTML = `See More (${allHubMembers.length - newVisible} left) <i class="fa-solid fa-arrow-right"></i>`;
-                    }
-                }
-                
-                if (!hubShowingAll) {
-                    document.getElementById('hub').scrollIntoView({ behavior: 'smooth' });
-                }
-            } else {
-                hubShowingAll = false;
-                renderHubGrid();
+                document.getElementById('hub').scrollIntoView({ behavior: 'smooth' });
             }
         }
 
@@ -1009,7 +924,7 @@
             const member = allHubMembers.find(m => m.email === email);
             if (!member) return;
 
-            const img = getOptimizedImage(member.selectedImage || member.image1, 600, 400);
+            const img = optimizeImage(member.selectedImage || member.image1 || 'Assets/100_Logo.png', 800);
             const joinDate = member.timestamp
                 ? new Date(member.timestamp).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
                 : '';
@@ -1051,7 +966,7 @@
 
             document.getElementById('memberModalBody').innerHTML = `
                 <div class="member-modal-photo">
-                    <img src="${img}" alt="${member.name}" loading="lazy" />
+                    <img src="${img}" alt="${member.name}" />
                 </div>
                 <div class="member-modal-details">
                     <h2 class="member-modal-name">${member.name}</h2>
@@ -1129,7 +1044,7 @@
         });
 
         // ==========================================
-        // SIGNUP MODAL FORM SUBMISSION
+        // SIGNUP MODAL FORM SUBMISSION - FIXED
         // ==========================================
         document.getElementById('signupModalForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1214,13 +1129,6 @@
                     form.style.display = 'none';
                     successDiv.style.display = 'block';
                     fileInput.value = '';
-                    document.getElementById('modalMemberName').value = '';
-                    document.getElementById('modalMemberEmail').value = '';
-                    document.getElementById('modalMemberRole').value = '';
-                    document.getElementById('modalMemberSkills').value = '';
-                    document.getElementById('modalMemberWebsite').value = '';
-                    document.getElementById('modalSocialPlatform').value = '';
-                    document.getElementById('modalSocialHandle').value = '';
                 } else {
                     alert(result.error || 'Something went wrong. Please try again.');
                 }
@@ -1656,7 +1564,7 @@
 
                     html += `
                         <div style="display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid #f0f0f0;">
-                            ${imgSrc ? `<img src="${imgSrc}" style="width:32px; height:32px; object-fit:cover; border-radius:4px; flex-shrink:0;" loading="lazy" />` : ''}
+                            ${imgSrc ? `<img src="${imgSrc}" style="width:32px; height:32px; object-fit:cover; border-radius:4px; flex-shrink:0;" />` : ''}
                             <div style="flex:1; min-width:0;">
                                 <div style="font-size:11px; color:#333; font-family:monospace; word-break:break-all; background:#f5f5f5; padding:3px 6px; border-radius:3px;">
                                     ${postId}
