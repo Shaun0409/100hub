@@ -102,21 +102,29 @@
         }
         .hub-card .hub-links {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
             margin-top: 4px;
         }
         .hub-card .hub-links a {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 4px;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-muted);
             text-decoration: none;
             transition: var(--transition-fast);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid var(--gray-medium);
+            background: var(--white);
         }
         .hub-card .hub-links a:hover {
             color: var(--red);
+            border-color: var(--red);
+            background: rgba(227,30,36,0.04);
         }
         .hub-card .hub-links a i {
             font-size: 13px;
@@ -1116,26 +1124,25 @@
                     ? new Date(member.timestamp).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
                     : '';
                 
-                // Website link
+                // Website link - icon only
                 let websiteHtml = '';
                 if (member.website) {
-                    const display = member.website.replace(/^https?:\/\//, '').replace(/\/$/, '');
                     websiteHtml = `
-                        <a href="${member.website}" target="_blank" rel="noopener" class="hub-website" title="Website">
-                            <i class="fa-regular fa-globe"></i> ${display}
+                        <a href="${member.website}" target="_blank" rel="noopener" class="hub-website" title="Visit Website" onclick="event.stopPropagation();">
+                            <i class="fa-regular fa-globe"></i>
                         </a>
                     `;
                 }
 
-                // Social link with platform label
+                // Social link - icon only (no handle text)
                 let socialHtml = '';
                 if (member.socialPlatform && member.socialHandle) {
                     const meta = SOCIAL_META[member.socialPlatform];
                     if (meta) {
                         const url = meta.url(member.socialHandle);
                         socialHtml = `
-                            <a href="${url}" target="_blank" rel="noopener" class="hub-social" title="${meta.label}">
-                                <i class="${meta.icon}"></i> ${meta.label}
+                            <a href="${url}" target="_blank" rel="noopener" class="hub-social" title="${meta.label}: @${member.socialHandle}" onclick="event.stopPropagation();">
+                                <i class="${meta.icon}"></i>
                             </a>
                         `;
                     }
@@ -1188,7 +1195,7 @@
         }
 
         // ==========================================
-        // MEMBER PROFILE MODAL - UPDATED with platform label
+        // MEMBER PROFILE MODAL - with platform label
         // ==========================================
         function openMemberModal(email) {
             const member = allHubMembers.find(m => m.email === email);
@@ -1199,7 +1206,7 @@
                 ? new Date(member.timestamp).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
                 : '';
 
-            // Social link with platform label
+            // Social link with platform label ("Platform: @handle")
             let socialHtml = '';
             if (member.socialPlatform && member.socialHandle) {
                 const meta = SOCIAL_META[member.socialPlatform];
