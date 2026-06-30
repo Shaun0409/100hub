@@ -524,7 +524,7 @@
                     See More <i class="fa-solid fa-arrow-down"></i>
                 </button>
             </div>
-            <!-- Instagram Link -->
+            <!-- Instagram Link - Very small, optional -->
             <div class="see-more-container" style="margin-top:8px;">
                 <a href="https://www.instagram.com/100projectsmedia" target="_blank" class="see-more-btn" style="opacity:0.3; font-size:10px; padding:6px 16px;">
                     <i class="fa-brands fa-instagram"></i> Follow on Instagram
@@ -1060,7 +1060,7 @@
         }
 
         // ==========================================
-        // MEMBER PROFILE MODAL - Full Details
+        // MEMBER PROFILE MODAL - Full Details with Social Platform Label
         // ==========================================
         function openMemberModal(email) {
             const member = allHubMembers.find(m => m.email === email);
@@ -1071,7 +1071,7 @@
                 ? new Date(member.timestamp).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
                 : '';
 
-            // Social link with platform label
+            // Social link with platform label ("Platform: @handle")
             let socialHtml = '';
             if (member.socialPlatform && member.socialHandle) {
                 const meta = SOCIAL_META[member.socialPlatform];
