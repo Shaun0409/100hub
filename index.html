@@ -482,8 +482,10 @@
         <div class="signup-modal-overlay" id="signupModalOverlay"></div>
         <div class="signup-modal-content">
             <button class="signup-modal-close" id="signupModalClose"><i class="fa-solid fa-xmark"></i></button>
-            <h2 style="font-family:'Playfair Display',serif; font-size:28px; margin-bottom:8px;">Join the <span style="color:var(--red);">100 HUB</span></h2>
-            <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Apply to become a member of our creative community</p>
+            <div id="modalFormHeader">
+                <h2 style="font-family:'Playfair Display',serif; font-size:28px; margin-bottom:8px;">Join the <span style="color:var(--red);">100 HUB</span></h2>
+                <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Apply to become a member of our creative community</p>
+            </div>
             <form id="signupModalForm">
                 <div class="form-group">
                     <label>Professional Photo (3 images)</label>
@@ -536,7 +538,6 @@
                     You'll hear from us once your profile has been reviewed.
                 </p>
             </div>
-            </form>
         </div>
     </div>
 
@@ -1023,6 +1024,10 @@
         function openSignupModal() {
             signupModal.classList.add('active');
             document.body.style.overflow = 'hidden';
+            // Reset to a clean form state every time the modal opens
+            document.getElementById('modalFormHeader').style.display = 'block';
+            document.getElementById('signupModalForm').style.display = 'block';
+            document.getElementById('modalFormSuccess').style.display = 'none';
         }
 
         function closeSignupModal() {
@@ -1126,6 +1131,7 @@
                 const result = await response.json();
 
                 if (result.success) {
+                    document.getElementById('modalFormHeader').style.display = 'none';
                     form.style.display = 'none';
                     successDiv.style.display = 'block';
                     fileInput.value = '';

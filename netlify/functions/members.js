@@ -27,6 +27,7 @@ exports.handler = async function(event, context) {
     }
 
     try {
+        const response = await fetch(SHEET_BEST_API);
         let sheetMembers = [];
 
         if (response.ok) {
