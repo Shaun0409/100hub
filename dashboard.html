@@ -480,31 +480,304 @@
             100% { background-position: 200% 0; }
         }
 
-        @media (max-width: 768px) {
+        /* ---- HAMBURGER MENU ---- */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px;
+            z-index: 1001;
+            background: none;
+            border: none;
+        }
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: var(--transition-fast);
+            border-radius: 2px;
+        }
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* Mobile Slide-out Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100vh;
+            background: var(--white);
+            z-index: 9999;
+            padding: 80px 30px 30px;
+            transition: right 0.35s ease;
+            box-shadow: -4px 0 30px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        .mobile-menu.open {
+            right: 0;
+        }
+        .mobile-menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s ease;
+        }
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .mobile-menu a {
+            display: block;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--gray-medium);
+            transition: var(--transition-fast);
+        }
+        .mobile-menu a:hover {
+            color: var(--red);
+            padding-left: 8px;
+        }
+        .mobile-menu .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            transition: var(--transition-fast);
+        }
+        .mobile-menu .mobile-menu-close:hover {
+            color: var(--red);
+            transform: rotate(90deg);
+        }
+
+        /* ---- PIN PROTECTION ---- */
+        .pin-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--pure-white);
+        }
+        .pin-overlay.hidden {
+            display: none;
+        }
+        .pin-box {
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            padding: 40px;
+        }
+        .pin-box .lock-icon {
+            font-size: 48px;
+            color: var(--red);
+            margin-bottom: 16px;
+        }
+        .pin-box h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .pin-box p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .pin-box .pin-inputs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .pin-box .pin-inputs input {
+            width: 55px;
+            height: 65px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            border: 2px solid var(--gray-medium);
+            border-radius: var(--radius-sm);
+            background: var(--white);
+            color: var(--text-primary);
+            transition: var(--transition-fast);
+            font-family: 'Inter', sans-serif;
+        }
+        .pin-box .pin-inputs input:focus {
+            outline: none;
+            border-color: var(--red);
+            box-shadow: var(--shadow-red);
+        }
+        .pin-box .pin-inputs input.error {
+            border-color: #ff4444;
+            animation: shake 0.4s ease;
+        }
+        .pin-box .pin-error {
+            color: #ff4444;
+            font-size: 13px;
+            min-height: 24px;
+            margin-bottom: 12px;
+        }
+        .pin-box .pin-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .pin-box .pin-actions button {
+            padding: 10px 32px;
+            border-radius: 60px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .pin-box .pin-actions .btn-pin-submit {
+            background: var(--red);
+            color: var(--white);
+            border: none;
+        }
+        .pin-box .pin-actions .btn-pin-submit:hover {
+            background: var(--red-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-red);
+        }
+        .pin-box .pin-actions .btn-pin-clear {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--gray-medium);
+        }
+        .pin-box .pin-actions .btn-pin-clear:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+        .pin-box .pin-attempts {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 16px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @media (max-width: 820px) {
+            .hamburger {
+                display: flex;
+            }
+            .nav-links {
+                display: none !important;
+            }
+            .nav-inner {
+                justify-content: space-between !important;
+            }
+            .dashboard-title {
+                font-size: 28px;
+            }
             .dashboard-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            .dashboard-stats { width: 100%; }
-            .stat-card { flex: 1; min-width: 80px; }
-            .dashboard-title { font-size: 28px; }
-            .add-partner-form { flex-direction: column; }
-            .add-partner-form input { width: 100%; }
-            .partner-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-            .impact-grid { grid-template-columns: 1fr 1fr; }
-            .impact-edit-form { grid-template-columns: 1fr; }
-            .image-select-grid { grid-template-columns: repeat(3, 1fr); }
-            .edit-modal-content { padding: 20px; }
-            .dashboard-tabs button { padding: 8px 16px; font-size: 12px; }
+            .dashboard-stats {
+                width: 100%;
+            }
+            .stat-card {
+                flex: 1;
+                min-width: 80px;
+            }
+            .add-partner-form {
+                flex-direction: column;
+            }
+            .add-partner-form input {
+                width: 100%;
+            }
+            .partner-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            .impact-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .impact-edit-form {
+                grid-template-columns: 1fr;
+            }
+            .image-select-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .edit-modal-content {
+                padding: 20px;
+            }
+            .dashboard-tabs button {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
         }
+
         @media (max-width: 480px) {
-            .impact-grid { grid-template-columns: 1fr 1fr; }
-            .image-select-grid { grid-template-columns: 1fr 1fr; }
+            .impact-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .image-select-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mobile-menu {
+                width: 100%;
+            }
+            .pin-box .pin-inputs input {
+                width: 45px;
+                height: 55px;
+                font-size: 24px;
+            }
+            .pin-box {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- ==================== PIN PROTECTION OVERLAY ==================== -->
+    <div class="pin-overlay" id="pinOverlay">
+        <div class="pin-box">
+            <div class="lock-icon"><i class="fa-solid fa-lock"></i></div>
+            <h2>Enter PIN</h2>
+            <p>Enter the 4-digit PIN to access the dashboard</p>
+            <div class="pin-inputs" id="pinInputs">
+                <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" id="pin1" autofocus />
+                <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" id="pin2" />
+                <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" id="pin3" />
+                <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" id="pin4" />
+            </div>
+            <div class="pin-error" id="pinError"></div>
+            <div class="pin-actions">
+                <button class="btn-pin-submit" id="pinSubmitBtn">Unlock</button>
+                <button class="btn-pin-clear" id="pinClearBtn">Clear</button>
+            </div>
+            <div class="pin-attempts" id="pinAttempts"></div>
+        </div>
+    </div>
+
+    <!-- ==================== NAVIGATION ==================== -->
     <nav class="navbar">
         <div class="container">
             <div class="nav-inner">
@@ -512,6 +785,12 @@
                     <img src="Assets/100_Logo.png" alt="100 HUB" class="logo-img" />
                     <span class="logo-text"><span class="highlight-red">HUB</span></span>
                 </a>
+                <!-- Hamburger Button -->
+                <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <div class="nav-links">
                     <a href="/">Home</a>
                     <a href="/dashboard.html" style="color:var(--red);">Dashboard</a>
@@ -520,7 +799,18 @@
         </div>
     </nav>
 
-    <section class="dashboard-layout">
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Mobile Slide-out Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" id="mobileMenuClose"><i class="fa-solid fa-xmark"></i></button>
+        <a href="/">Home</a>
+        <a href="/dashboard.html" style="color:var(--red);">Dashboard</a>
+    </div>
+
+    <!-- ==================== DASHBOARD CONTENT ==================== -->
+    <section class="dashboard-layout" id="dashboardContent">
         <div class="container">
             <div class="dashboard-header">
                 <div>
@@ -757,6 +1047,130 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // ==========================================
+        // PIN PROTECTION
+        // ==========================================
+        const CORRECT_PIN = '3689';
+        let pinAttempts = 0;
+        const MAX_ATTEMPTS = 5;
+
+        function initPinProtection() {
+            const pinOverlay = document.getElementById('pinOverlay');
+            const pinInputs = document.querySelectorAll('.pin-inputs input');
+            const pinError = document.getElementById('pinError');
+            const pinAttemptsEl = document.getElementById('pinAttempts');
+            const submitBtn = document.getElementById('pinSubmitBtn');
+            const clearBtn = document.getElementById('pinClearBtn');
+
+            // Focus first input on load
+            setTimeout(() => pinInputs[0].focus(), 100);
+
+            // Auto-advance to next input
+            pinInputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    if (this.value.length === 1 && index < pinInputs.length - 1) {
+                        pinInputs[index + 1].focus();
+                    }
+                    // Clear error on input
+                    pinError.textContent = '';
+                    this.classList.remove('error');
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                        pinInputs[index - 1].focus();
+                    }
+                    if (e.key === 'Enter') {
+                        submitBtn.click();
+                    }
+                });
+            });
+
+            // Submit PIN
+            submitBtn.addEventListener('click', function() {
+                const pin = Array.from(pinInputs).map(input => input.value).join('');
+                
+                if (pin.length !== 4) {
+                    pinError.textContent = 'Please enter all 4 digits.';
+                    return;
+                }
+
+                if (pin === CORRECT_PIN) {
+                    pinOverlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    return;
+                }
+
+                pinAttempts++;
+                const remaining = MAX_ATTEMPTS - pinAttempts;
+                pinError.textContent = `Incorrect PIN. ${remaining} attempts remaining.`;
+                pinAttemptsEl.textContent = `Attempts: ${pinAttempts}/${MAX_ATTEMPTS}`;
+
+                // Shake and clear inputs
+                pinInputs.forEach(input => {
+                    input.classList.add('error');
+                    input.value = '';
+                });
+
+                setTimeout(() => {
+                    pinInputs.forEach(input => input.classList.remove('error'));
+                    pinInputs[0].focus();
+                }, 500);
+
+                if (pinAttempts >= MAX_ATTEMPTS) {
+                    pinError.textContent = 'Too many failed attempts. Refresh the page to try again.';
+                    pinInputs.forEach(input => input.disabled = true);
+                    submitBtn.disabled = true;
+                    clearBtn.disabled = true;
+                }
+            });
+
+            // Clear all inputs
+            clearBtn.addEventListener('click', function() {
+                pinInputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('error');
+                });
+                pinError.textContent = '';
+                pinInputs[0].focus();
+            });
+
+            // Prevent clicking outside
+            pinOverlay.addEventListener('click', function(e) {
+                if (e.target === this) return;
+            });
+        }
+
+        // ==========================================
+        // HAMBURGER MENU
+        // ==========================================
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        const mobileMenuClose = document.getElementById('mobileMenuClose');
+
+        function toggleMobileMenu() {
+            hamburgerBtn.classList.toggle('active');
+            mobileMenu.classList.toggle('open');
+            mobileMenuOverlay.classList.toggle('active');
+            document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+        }
+
+        function closeMobileMenu() {
+            hamburgerBtn.classList.remove('active');
+            mobileMenu.classList.remove('open');
+            mobileMenuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        hamburgerBtn.addEventListener('click', toggleMobileMenu);
+        mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+        mobileMenuClose.addEventListener('click', closeMobileMenu);
+
+        // ==========================================
+        // API BASE
+        // ==========================================
         const API_BASE = '/.netlify/functions';
         let currentMemberId = null;
         let currentFilter = 'all';
@@ -767,7 +1181,7 @@
         const CACHE = {
             members: null,
             timestamp: null,
-            duration: 30000, // 30 seconds cache
+            duration: 30000,
             
             get(key) {
                 if (!this[key] || !this.timestamp) return null;
@@ -818,7 +1232,6 @@
         let allMembers = [];
 
         async function fetchMembers() {
-            // Check cache first
             const cached = CACHE.get('members');
             if (cached) {
                 console.log('📦 Using cached members data');
@@ -828,7 +1241,6 @@
             try {
                 const response = await fetch(`${API_BASE}/members`);
                 const data = await response.json();
-                // Store in cache
                 CACHE.set('members', data);
                 return data;
             } catch (error) {
@@ -927,7 +1339,6 @@
             document.getElementById('editRole').value = member.role || '';
             document.getElementById('editSkills').value = member.skills || '';
 
-            // Render image selection with optimized images
             const grid = document.getElementById('imageSelectGrid');
             const images = [member.image1, member.image2, member.image3].filter(img => img);
             
@@ -966,7 +1377,7 @@
         }
 
         // ==========================================
-        // UPDATE MEMBER - via Netlify function
+        // UPDATE MEMBER
         // ==========================================
         async function updateMemberDirect(email, updates) {
             try {
@@ -992,9 +1403,6 @@
             }
         }
 
-        // ==========================================
-        // SAVE MEMBER EDITS
-        // ==========================================
         async function saveMemberEdits() {
             const updates = {
                 name: document.getElementById('editName').value,
@@ -1014,9 +1422,6 @@
             }
         }
 
-        // ==========================================
-        // UPDATE MEMBER STATUS (Accept/Decline)
-        // ==========================================
         async function updateMemberStatus(status) {
             const updates = {
                 status: status,
@@ -1251,6 +1656,10 @@
         // INIT
         // ==========================================
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize PIN protection first
+            initPinProtection();
+            
+            // Then load dashboard content
             renderMembers();
             loadPartners();
             checkMediaKit();
