@@ -3,11 +3,6 @@
 
 const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Members';
 
-// Function-level cache
-let cachedData = null;
-let cacheTime = null;
-const CACHE_TTL = 60 * 1000; // 1 minute
-
 function emailToId(email) {
     return 'member_' + email.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
@@ -32,17 +27,6 @@ exports.handler = async function(event, context) {
     }
 
     try {
-        // Check function-level cache
-        if (cachedData && cacheTime && (Date.now() - cacheTime < CACHE_TTL)) {
-            console.log('📦 Using cached response');
-            return {
-                statusCode: 200,
-                headers: { ...headers, 'Cache-Control': 'public, max-age=60' },
-                body: JSON.stringify(cachedData)
-            };
-        }
-
-        const response = await fetch(SHEET_BEST_API);
         let sheetMembers = [];
 
         if (response.ok) {
@@ -124,13 +108,9 @@ exports.handler = async function(event, context) {
             declined: declinedCount
         };
 
-        // Cache the result
-        cachedData = result;
-        cacheTime = Date.now();
-
         return {
             statusCode: 200,
-            headers: { ...headers, 'Cache-Control': 'public, max-age=60' },
+            headers: { ...headers, 'Cache-Control': 'no-store' },
             body: JSON.stringify(result)
         };
     } catch (error) {
