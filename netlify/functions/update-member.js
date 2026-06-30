@@ -4,8 +4,9 @@
 
 const SHEET_BEST_API = 'https://api.sheetbest.com/sheets/7fb06936-5f4f-4ca5-bb81-b4e8af870b57/tabs/Members';
 
-// ✅ Change to your domain email once you have one e.g. 'hello@100projectsmedia.co.za'
-const EMAIL_FROM = 'onboarding@resend.dev';
+// Resend email configuration - using verified domain
+const EMAIL_FROM = 'noreply@100hub.co.za';
+const REPLY_TO_EMAIL = '100projectsmedia@gmail.com';
 
 async function sendEmail({ to, subject, html }) {
     const apiKey = process.env.RESEND_API_KEY;
@@ -19,7 +20,13 @@ async function sendEmail({ to, subject, html }) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`
         },
-        body: JSON.stringify({ from: EMAIL_FROM, to, subject, html })
+        body: JSON.stringify({
+            from: `100 HUB <${EMAIL_FROM}>`,
+            to: [to],
+            reply_to: REPLY_TO_EMAIL,
+            subject,
+            html
+        })
     });
     if (!res.ok) {
         console.error('Resend error:', await res.text());
