@@ -601,9 +601,9 @@
                     Load More Posts <i class="fa-solid fa-arrow-down"></i>
                 </button>
             </div>
-            <!-- Instagram Link -->
-            <div class="see-more-container" style="margin-top:12px;">
-                <a href="https://www.instagram.com/100projectsmedia" target="_blank" class="see-more-btn" style="opacity:0.6; font-size:12px;">
+            <!-- Instagram Link - Very small, optional -->
+            <div class="see-more-container" style="margin-top:8px;">
+                <a href="https://www.instagram.com/100projectsmedia" target="_blank" class="see-more-btn" style="opacity:0.3; font-size:10px; padding:6px 16px;">
                     <i class="fa-brands fa-instagram"></i> Follow on Instagram
                 </a>
             </div>
@@ -1127,7 +1127,7 @@
                     `;
                 }
 
-                // Social link
+                // Social link with platform label
                 let socialHtml = '';
                 if (member.socialPlatform && member.socialHandle) {
                     const meta = SOCIAL_META[member.socialPlatform];
@@ -1135,7 +1135,7 @@
                         const url = meta.url(member.socialHandle);
                         socialHtml = `
                             <a href="${url}" target="_blank" rel="noopener" class="hub-social" title="${meta.label}">
-                                <i class="${meta.icon}"></i> @${member.socialHandle}
+                                <i class="${meta.icon}"></i> ${meta.label}
                             </a>
                         `;
                     }
@@ -1188,7 +1188,7 @@
         }
 
         // ==========================================
-        // MEMBER PROFILE MODAL
+        // MEMBER PROFILE MODAL - UPDATED with platform label
         // ==========================================
         function openMemberModal(email) {
             const member = allHubMembers.find(m => m.email === email);
@@ -1199,20 +1199,23 @@
                 ? new Date(member.timestamp).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
                 : '';
 
+            // Social link with platform label
             let socialHtml = '';
             if (member.socialPlatform && member.socialHandle) {
                 const meta = SOCIAL_META[member.socialPlatform];
                 if (meta) {
                     const url = meta.url(member.socialHandle);
+                    const platformLabel = meta.label;
                     socialHtml = `
                         <a href="${url}" target="_blank" rel="noopener" class="member-social-link">
                             <i class="${meta.icon}"></i>
-                            <span>@${member.socialHandle}</span>
+                            <span>${platformLabel}: @${member.socialHandle}</span>
                         </a>
                     `;
                 }
             }
 
+            // Website link - clean, no X button
             let websiteHtml = '';
             if (member.website) {
                 const display = member.website.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -1824,199 +1827,6 @@
             console.log('📸 Feed ID:', BEHOLD_FEED_ID);
             console.log('👥 Member Count:', memberCount, '/', MAX_MEMBERS);
             console.log('🤝 Partner Logos:', partnerLogos.length);
-        });
-    </script>
-
-    <!-- ==================== POST ID TOOL ==================== -->
-    <div id="postIdTool" style="display:none; position:fixed; bottom:80px; right:20px; max-width:360px; width:90%; max-height:60vh; overflow-y:auto; background:var(--white); border:1px solid #e0e0e0; border-radius:var(--radius-sm); padding:14px 16px; z-index:9998; box-shadow:0 4px 30px rgba(0,0,0,0.1);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h3 style="font-family:'Playfair Display',serif; font-size:15px; color:#1A1A1A; margin:0;">🔑 Post IDs</h3>
-            <button onclick="document.getElementById('postIdTool').style.display='none'" style="background:none; border:none; color:#999; font-size:16px; cursor:pointer; padding:0 4px;">✕</button>
-        </div>
-        <p style="font-size:10px; color:#999; margin-bottom:10px;">Copy the ID for each post → paste into Google Sheet with article URL.</p>
-        <div id="postIdList" style="max-height:30vh; overflow-y:auto;">
-            <p style="color:#999; font-size:11px;">Loading posts...</p>
-        </div>
-        <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
-            <button onclick="copyAllPostIds()" style="background:var(--red); color:var(--white); border:none; border-radius:60px; padding:5px 14px; font-size:10px; cursor:pointer;">
-                📋 Copy All
-            </button>
-            <button onclick="document.getElementById('postIdTool').style.display='none'" style="background:#f0f0f0; color:#666; border:1px solid #ddd; border-radius:60px; padding:5px 14px; font-size:10px; cursor:pointer;">
-                Close
-            </button>
-        </div>
-    </div>
-
-    <button onclick="openPostIdTool()" style="position:fixed; bottom:20px; right:20px; background:rgba(227,30,36,0.1); color:var(--red); border:1px solid rgba(227,30,36,0.15); border-radius:50%; width:30px; height:30px; font-size:11px; cursor:pointer; z-index:9999; transition:var(--transition-fast); display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); opacity:0.4;">
-        🔑
-    </button>
-
-    <script>
-        // ==========================================
-        // POST ID TOOL FUNCTIONS
-        // ==========================================
-        let cachedPostIds = [];
-
-        window.openPostIdTool = function() {
-            const tool = document.getElementById('postIdTool');
-            if (!tool) return;
-            tool.style.display = 'block';
-            loadPostIds();
-        };
-
-        window.copyPostId = function(postId) {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(postId).then(() => {
-                    showToast('✅ Copied: ' + postId);
-                }).catch(() => {
-                    fallbackCopy(postId);
-                });
-            } else {
-                fallbackCopy(postId);
-            }
-        };
-
-        window.copyAllPostIds = function() {
-            if (cachedPostIds.length === 0) {
-                showToast('⚠️ No post IDs to copy.');
-                return;
-            }
-            const text = cachedPostIds.join('\n');
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast('✅ Copied ' + cachedPostIds.length + ' post IDs!');
-                }).catch(() => {
-                    fallbackCopy(text);
-                });
-            } else {
-                fallbackCopy(text);
-            }
-        };
-
-        function loadPostIds() {
-            const container = document.getElementById('postIdList');
-            if (!container) return;
-            
-            const items = document.querySelectorAll('.feed-item');
-            if (items.length === 0) {
-                container.innerHTML = '<p style="color:#999; font-size:11px;">No posts found. Wait for the feed to load.</p>';
-                return;
-            }
-
-            cachedPostIds = [];
-            let html = '';
-            
-            items.forEach((el, index) => {
-                try {
-                    const data = JSON.parse(el.dataset.post);
-                    const postId = data.id || 'Unknown';
-                    const permalink = data.permalink || '#';
-                    cachedPostIds.push(postId);
-
-                    let imgSrc = '';
-                    if (data.sizes?.large?.mediaUrl) {
-                        imgSrc = data.sizes.large.mediaUrl;
-                    } else if (data.mediaUrl) {
-                        imgSrc = data.mediaUrl;
-                    }
-
-                    html += `
-                        <div style="display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid #f0f0f0;">
-                            ${imgSrc ? `<img src="${imgSrc}" style="width:32px; height:32px; object-fit:cover; border-radius:4px; flex-shrink:0;" />` : ''}
-                            <div style="flex:1; min-width:0;">
-                                <div style="font-size:11px; color:#333; font-family:monospace; word-break:break-all; background:#f5f5f5; padding:3px 6px; border-radius:3px;">
-                                    ${postId}
-                                </div>
-                            </div>
-                            <div style="display:flex; gap:4px; flex-shrink:0;">
-                                <button onclick="copyPostId('${postId}')" style="background:#f0f0f0; border:1px solid #ddd; border-radius:4px; color:#333; padding:2px 8px; font-size:10px; cursor:pointer;">
-                                    📋
-                                </button>
-                                <a href="${permalink}" target="_blank" style="background:#f0f0f0; border:1px solid #ddd; border-radius:4px; color:#333; padding:2px 8px; font-size:10px; text-decoration:none;">
-                                    👁️
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                } catch (e) {}
-            });
-
-            if (html === '') {
-                container.innerHTML = '<p style="color:#999; font-size:11px;">No posts found.</p>';
-            } else {
-                container.innerHTML = html;
-            }
-        }
-
-        function fallbackCopy(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                showToast('✅ Copied: ' + text);
-            } catch (e) {
-                showToast('⚠️ Could not copy.');
-            }
-            document.body.removeChild(textarea);
-        }
-
-        function showToast(message) {
-            const existing = document.querySelector('.post-id-toast');
-            if (existing) existing.remove();
-            
-            const toast = document.createElement('div');
-            toast.className = 'post-id-toast';
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 100px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: #1A1A1A;
-                border-radius: 8px;
-                padding: 10px 20px;
-                color: #fff;
-                font-size: 12px;
-                z-index: 10000;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-                animation: fadeInUp 0.3s ease;
-                max-width: 90%;
-                text-align: center;
-            `;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        const toolStyle = document.createElement('style');
-        toolStyle.textContent = `
-            @keyframes fadeInUp {
-                from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-                to { opacity: 1; transform: translateX(-50%) translateY(0); }
-            }
-        `;
-        document.head.appendChild(toolStyle);
-
-        const toolObserver = new MutationObserver(() => {
-            const tool = document.getElementById('postIdTool');
-            if (tool && tool.style.display !== 'none') {
-                loadPostIds();
-            }
-        });
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const feed = document.getElementById('instagramFeed');
-            if (feed) {
-                toolObserver.observe(feed, { childList: true, subtree: true });
-            }
         });
     </script>
 
